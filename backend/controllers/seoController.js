@@ -591,7 +591,7 @@ const generateBlog = async (req, res) => {
       Create an advanced SEO blueprint for a long-form blog post about: "${topic}".
       Identify 3 secondary keywords, a catchy H1 title, and a logical H2 outline.
       
-      Response Format:
+      Response Format (Strict JSON):
       {
         "h1": "SEO Optimized Title",
         "keywords": ["key1", "key2", "key3"],
@@ -612,14 +612,14 @@ const generateBlog = async (req, res) => {
       Use Markdown formatting (H2, H3, Bold, Lists).
       Provide a 160-character excerpt at the end.
 
-      Response Format:
+      Response Format (Return as JSON):
       {
         "title": "${architect.h1}",
         "content": "Full markdown content here...",
         "excerpt": "Short engaging excerpt here...",
         "slug": "${architect.slug}"
       }
-    `, 'You are a high-perplexity content writer. Avoid robotic cliches.');
+    `, 'You are a high-perplexity content writer. Always respond in JSON format.');
 
     res.json(writing);
   } catch (err) {
