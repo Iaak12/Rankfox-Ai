@@ -766,7 +766,12 @@
   .footer-offices { max-width: 100%; }
   
   /* Footer adjustments */
-  .rankfox-footer { background-image: none; } /* Hide the massive 3D tree on mobile to keep text readable */
+  .rankfox-footer { 
+    background-size: cover; 
+    background-position: center bottom;
+    background-image: url('/footer_landscape.png');
+  } 
+  .rankfox-footer-content { padding-top: 40px; padding-bottom: 250px; }
 
   /* Navbar Mobile Layout */
   .public-navbar { padding: 16px 24px; background: #000; } /* Solid bg on mobile so dropdown looks good */
