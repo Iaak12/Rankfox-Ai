@@ -330,6 +330,33 @@ Ensure the numbers look realistic and varied. The "trafficData" array must have 
   }
 };
 
+/* ─── Indexing Request Simulation ─── */
+// POST /api/seo/request-indexing  { url }
+const requestIndexing = async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: 'URL required' });
+
+  try {
+    const data = await askGroq(`
+You are a Google Search Console indexing API simulator.
+Analyze this URL for indexability: "${url}"
+
+If the URL looks like a valid, well-formed web page address, respond with a success status. If it looks like a junk string or broken URL, respond with an error.
+
+Return JSON EXACTLY like this:
+{
+  "success": true | false,
+  "status": "Pending" | "Failed",
+  "message": "specific message about the indexing request"
+}
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Indexing request error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -339,4 +366,5 @@ module.exports = {
   linkOpportunities,
   technicalAnalysis,
   generateInsights,
+  requestIndexing,
 };
