@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+
+const API_URL = getViteApiUrl();
+
 export default function Landing() {
   const [content, setContent] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('http://localhost:5000/api/content/home')
+    fetch(`${API_URL}/content/home`)
       .then(res => res.json())
       .then(data => setContent(data.sections))
       .catch(err => console.error('Error fetching home content:', err));

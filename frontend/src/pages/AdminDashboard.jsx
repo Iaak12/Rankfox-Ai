@@ -103,7 +103,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await fetch('http://localhost:5000/api/faqs', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faqs`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Delete this FAQ?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await fetch(`http://localhost:5000/api/faqs/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+
+const API_URL = getViteApiUrl();
+
 export default function Pricing() {
   const [content, setContent] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('http://localhost:5000/api/content/pricing')
+    fetch(`${API_URL}/content/pricing`)
       .then(res => res.json())
       .then(data => setContent(data.sections))
       .catch(err => console.error('Error fetching pricing content:', err));

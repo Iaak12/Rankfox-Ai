@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+
+const API_URL = getViteApiUrl();
+
 export default function About() {
   const [content, setContent] = useState(null);
   const [faqs, setFaqs] = useState([]);
@@ -10,13 +17,13 @@ export default function About() {
 
   useEffect(() => {
     // Fetch page content
-    fetch('http://localhost:5000/api/content/about')
+    fetch(`${API_URL}/content/about`)
       .then(res => res.json())
       .then(data => setContent(data.sections))
       .catch(err => console.error('Error fetching about content:', err));
 
     // Fetch FAQs
-    fetch('http://localhost:5000/api/faqs')
+    fetch(`${API_URL}/faqs`)
       .then(res => res.json())
       .then(data => setFaqs(data))
       .catch(err => console.error('Error fetching FAQs:', err));

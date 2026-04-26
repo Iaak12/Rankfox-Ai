@@ -3,6 +3,13 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Mail, MessageSquare, Clock, ArrowRight } from 'lucide-react';
 
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+
+const API_URL = getViteApiUrl();
+
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
@@ -19,7 +26,7 @@ export default function Contact() {
     setStatus('Sending your inquiry...');
 
     try {
-      const res = await fetch('http://localhost:5000/api/contact', {
+      const res = await fetch(`${API_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
