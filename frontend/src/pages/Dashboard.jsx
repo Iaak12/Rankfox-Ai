@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { seoApi } from '../utils/seoApi';
+import FoxPackTeam from '../components/FoxPackTeam';
 
 /* GSC Google icon (coloured) */
 function GSCIcon() {
@@ -107,6 +108,7 @@ export default function Dashboard() {
   const [loadingInsights, setLoadingInsights] = useState(false);
 
   const [generating, setGenerating] = useState({});
+  const [agentStatus, setAgentStatus] = useState({});
   const [modal, setModal] = useState(null);
   const navigate = useNavigate();
 
@@ -139,13 +141,17 @@ export default function Dashboard() {
 
   const handleCreate = async (art) => {
     setGenerating(g => ({ ...g, [art.id]: true }));
+    setAgentStatus(s => ({ ...s, [art.id]: 'Sly Thinking...' }));
+    
     try {
+      setTimeout(() => setAgentStatus(s => ({ ...s, [art.id]: 'Wordy Writing...' })), 3000);
       const data = await seoApi('generate', { title: art.title, keyword: art.keyword });
       setModal({ article: art, data });
     } catch (e) {
       alert('AI Error: ' + e.message);
     } finally {
       setGenerating(g => ({ ...g, [art.id]: false }));
+      setAgentStatus(s => ({ ...s, [art.id]: '' }));
     }
   };
 
@@ -264,8 +270,11 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Fox Pack Team */}
+      <FoxPackTeam />
+
       {/* Article Table */}
-      <div className="table-card">
+      <div className="table-card" style={{ marginTop: 24 }}>
         <div className="table-header">
           <span>Article Title</span>
           <span>Difficulty</span>
@@ -289,14 +298,14 @@ export default function Dashboard() {
               <div style={{ fontSize: 13, color: '#6b7280' }}>{art.volume.toLocaleString()}</div>
               <div className="table-actions">
                 <button
-                  className="action-btn"
+                  className="action-btn primary-btn"
                   onClick={() => handleCreate(art)}
                   disabled={isGen}
-                  style={{ minWidth: 90, opacity: isGen ? 0.7 : 1 }}
+                  style={{ minWidth: 120, opacity: isGen ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
                 >
                   {isGen
-                    ? <><span className="spinner" style={{ width: 11, height: 11 }} /> Writing…</>
-                    : <><Sparkles size={12} /> Create</>
+                    ? <><span className="spinner" style={{ width: 11, height: 11, borderTopColor: '#fff' }} /> {agentStatus[art.id]}</>
+                    : <><Sparkles size={12} /> Summon Pack</>
                   }
                 </button>
                 <button className="action-btn-icon" title="Copy" onClick={() => navigator.clipboard.writeText(art.title)}>
@@ -319,4 +328,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
 

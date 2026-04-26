@@ -108,10 +108,17 @@ export default function ContentLibrary() {
 
   const filtered = articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
 
+  const [agentStatus, setAgentStatus] = useState('');
+
   const handleGenerate = async () => {
     if (!topic.trim()) return alert("Please enter a topic");
     setGenerating(true);
+    setAgentStatus('Sly is analyzing competitor gaps...');
+    
     try {
+      // Simulate Sly thinking for a moment
+      setTimeout(() => setAgentStatus('Wordy is crafting your story...'), 3500);
+
       const data = await seoApi('generate', { title: topic, keyword: keyword });
       data._originalKeyword = keyword || topic;
       setArticleResult(data);
@@ -123,6 +130,7 @@ export default function ContentLibrary() {
       alert('AI Error: ' + e.message);
     } finally {
       setGenerating(false);
+      setAgentStatus('');
     }
   };
 
@@ -252,7 +260,7 @@ export default function ContentLibrary() {
           <div style={{ background: '#fff', borderRadius: 16, width: 480, padding: 24, boxShadow: '0 24px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Sparkles size={18} color="#2563eb" /> AI Article Writer
+                <Sparkles size={18} color="#2563eb" /> Fox Pack Generation
               </div>
               <button onClick={() => setShowPrompt(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={18} /></button>
             </div>
@@ -281,8 +289,8 @@ export default function ContentLibrary() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
               <button className="action-btn" onClick={() => setShowPrompt(false)}>Cancel</button>
-              <button className="primary-btn" onClick={handleGenerate} disabled={generating} style={{ opacity: generating ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-                {generating ? <><span className="spinner" style={{ width: 13, height: 13, borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} /> Generating...</> : 'Generate Article'}
+              <button className="primary-btn" onClick={handleGenerate} disabled={generating} style={{ opacity: generating ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 160, justifyContent: 'center' }}>
+                {generating ? <><span className="spinner" style={{ width: 13, height: 13, borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} /> {agentStatus}</> : 'Summon Fox Pack'}
               </button>
             </div>
           </div>
