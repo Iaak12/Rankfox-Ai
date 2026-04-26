@@ -1,6 +1,7 @@
 import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
+import AccountSettings from './pages/AccountSettings';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import ContentPlanner from './pages/ContentPlanner';
@@ -37,6 +38,7 @@ const PAGE_TITLES = {
   '/dashboard/boost': 'Instant Boost',
   '/dashboard/audit': 'Site Audit',
   '/dashboard/optimizer': 'Page Optimizer',
+  '/dashboard/account': 'My Account',
 };
 
 function ProtectedRoute({ children }) {
@@ -77,17 +79,50 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+/* Reads ?tab= from URL and opens correct AccountSettings tab */
+function AccountSettingsRoute() {
+  const { search } = useLocation();
+  const tab = new URLSearchParams(search).get('tab') || 'account';
+  return <AccountSettings defaultTab={tab} />;
+}
+
 function DashboardLayout() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const title = PAGE_TITLES[pathname] || 'Dashboard';
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+  const dropdownRef = React.useRef(null);
+
+  const goTo = (tab) => {
+    setShowProfileMenu(false);
+    navigate(`/dashboard/account?tab=${tab}`);
+  };
+
+  // Get initials: up to 2 letters from name
+  const getInitials = () => {
+    if (!user.name) return 'U';
+    const parts = user.name.trim().split(' ').filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
   };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <ProtectedRoute>
@@ -97,26 +132,34 @@ function DashboardLayout() {
           <div className="topbar">
             <h1>{title}</h1>
             <div className="topbar-right">
-              <div 
-                className="profile-trigger" 
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-              >
-                <div style={{ fontSize: 13, color: '#6b7280' }}>{user.email}</div>
-                <div className="user-avatar">{user.name?.charAt(0).toUpperCase()}</div>
-                
+              <div className="profile-trigger-wrap" ref={dropdownRef}>
+                <button
+                  className="user-avatar-initials"
+                  onClick={() => setShowProfileMenu(v => !v)}
+                  aria-label="Open profile menu"
+                >
+                  {getInitials()}
+                </button>
+
                 {showProfileMenu && (
                   <div className="profile-dropdown">
-                    <div className="dropdown-header">
-                      <div className="user-initials">{user.name?.charAt(0).toUpperCase()}</div>
-                      <div className="user-info">
-                        <div className="user-name">{user.name}</div>
-                        <div className="user-email-small">{user.email}</div>
-                      </div>
-                    </div>
-                    <div className="dropdown-divider"></div>
-                    <button className="dropdown-item logout" onClick={handleLogout}>
-                      <LogOut size={16} />
-                      <span>Logout</span>
+                    <button className="dropdown-item-link" onClick={() => goTo('account')}>
+                      <span className="dropdown-emoji">👋</span>
+                      My Account
+                    </button>
+                    <button className="dropdown-item-link" onClick={() => goTo('plans')}>
+                      Our Plans
+                    </button>
+                    <button className="dropdown-item-link" onClick={() => goTo('domains')}>
+                      Domain Manager
+                    </button>
+                    <button className="dropdown-item-link" onClick={() => goTo('integrations')}>
+                      Integrations
+                    </button>
+                    <div className="dropdown-divider" />
+                    <button className="dropdown-item-link logout-item" onClick={handleLogout}>
+                      <LogOut size={14} />
+                      Logout
                     </button>
                   </div>
                 )}
@@ -136,6 +179,7 @@ function DashboardLayout() {
             <Route path="/boost" element={<InstantBoost />} />
             <Route path="/audit" element={<SiteAudit />} />
             <Route path="/optimizer" element={<PageOptimizer />} />
+            <Route path="/account" element={<AccountSettingsRoute />} />
           </Routes>
         </div>
       </div>

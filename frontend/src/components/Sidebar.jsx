@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Calendar, BookOpen, BarChart2, Search,
-  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe
+  LayoutDashboard, Calendar, BookOpen, BarChart2,
+  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search
 } from 'lucide-react';
 
 const navItems = [
@@ -24,9 +24,9 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-          <rect width="26" height="26" rx="8" fill="#6c47ff"/>
-          <path d="M8 18 L13 8 L18 18 M10.5 14.5 h5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="7" fill="#7c3aed"/>
+          <path d="M9 19 L14 9 L19 19 M11.5 15 h5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         <span>RankFox.ai</span>
       </div>
@@ -40,11 +40,11 @@ export default function Sidebar() {
             end={to === '/dashboard'}
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
           >
-            <Icon size={16} />
-            {label}
+            <Icon size={15} />
+            <span>{label}</span>
             {locked && (
               <span className="nav-lock">
-                <Lock size={11} />
+                <Lock size={10} />
               </span>
             )}
           </NavLink>
