@@ -19,21 +19,30 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+  'https://rankfox-ai.vercel.app',       // production Vercel
+  'https://rankfox-ai-git-main-iaak12.vercel.app', // Vercel git branch preview
+  process.env.FRONTEND_URL,              // from Render env var
   'http://localhost:5173',
+  'http://localhost:3000',
   'http://127.0.0.1:5173',
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. curl, Postman) or matching origins
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow no-origin requests (Postman / curl) or matching/vercel preview URLs
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      /\.vercel\.app$/.test(origin)        // any Vercel preview deployment
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy: origin ${origin} not allowed`));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
 
