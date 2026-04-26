@@ -141,10 +141,10 @@ export default function Dashboard() {
 
   const handleCreate = async (art) => {
     setGenerating(g => ({ ...g, [art.id]: true }));
-    setAgentStatus(s => ({ ...s, [art.id]: 'Sly Thinking...' }));
+    setAgentStatus(s => ({ ...s, [art.id]: 'Rexo Thinking...' }));
     
     try {
-      setTimeout(() => setAgentStatus(s => ({ ...s, [art.id]: 'Wordy Writing...' })), 3000);
+      setTimeout(() => setAgentStatus(s => ({ ...s, [art.id]: 'Echo Writing...' })), 3000);
       const data = await seoApi('generate', { title: art.title, keyword: art.keyword });
       setModal({ article: art, data });
     } catch (e) {

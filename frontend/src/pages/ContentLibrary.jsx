@@ -113,11 +113,11 @@ export default function ContentLibrary() {
   const handleGenerate = async () => {
     if (!topic.trim()) return alert("Please enter a topic");
     setGenerating(true);
-    setAgentStatus('Sly is analyzing competitor gaps...');
+    setAgentStatus('Rexo is analyzing competitor gaps...');
     
     try {
-      // Simulate Sly thinking for a moment
-      setTimeout(() => setAgentStatus('Wordy is crafting your story...'), 3500);
+      // Simulate Rexo thinking for a moment
+      setTimeout(() => setAgentStatus('Echo is crafting your story...'), 3500);
 
       const data = await seoApi('generate', { title: topic, keyword: keyword });
       data._originalKeyword = keyword || topic;

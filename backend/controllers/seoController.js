@@ -91,9 +91,9 @@ const generateArticle = async (req, res) => {
     }
 
     // 2. Multi-Agent Workflow
-    // Agent 1: Sly (The Stealth Strategist) - Research & Planning
+    // Agent 1: Rexo (The SEO Strategist) - Research & Planning
     const architectPlan = await askGroq(`
-You are Sly, the Stealth Strategist for RankFox.
+You are Rexo, the SEO Strategist for RankFox.
 Your job is to analyze the topic: "${title}" and keyword: "${keyword}" to build a mathematically superior SEO blueprint.
 
 Generate a structured JSON plan:
@@ -102,18 +102,18 @@ Generate a structured JSON plan:
   "headings": ["H2: Strategic Title", "H3: Deep Dive Title"],
   "contentGapsToFill": ["competitor weakness 1", "missing info 2"]
 }
-`, 'You are Sly, the Lead SEO Architect. Respond in valid JSON only.', 'llama-3.1-8b-instant');
+`, 'You are Rexo, the Lead SEO Architect. Respond in valid JSON only.', 'llama-3.1-8b-instant');
 
-    // Agent 2: Wordy (The Content Artisan) - Lead Writing
+    // Agent 2: Echo (The Content Artisan) - Lead Writing
     const finalArticle = await askGroq(`
-You are Wordy, the Content Artisan for RankFox.
-I have a master blueprint from Sly. Your job is to craft a high-conversion, 100% human-sounding article.
+You are Echo, the Content Artisan for RankFox.
+I have a master blueprint from Rexo. Your job is to craft a high-conversion, 100% human-sounding article.
 
 Title: "${title}"
 Primary Keyword: "${keyword}"
 Tone: ${tone}
-Sly's LSI Keywords: ${architectPlan.lsiKeywords.join(', ')}
-Sly's Headings: ${architectPlan.headings.join(', ')}
+Rexo's LSI Keywords: ${architectPlan.lsiKeywords.join(', ')}
+Rexo's Headings: ${architectPlan.headings.join(', ')}
 Competitor Gaps to Crush: ${architectPlan.contentGapsToFill.join(', ')}
 
 Return JSON with this exact shape:
@@ -126,7 +126,7 @@ Return JSON with this exact shape:
   "seoScore": <number 70-100>,
   "tags": ["tag1", "tag2", "tag3"]
 }
-`, 'You are Wordy, a world-class SEO content writer. Respond in valid JSON only.');
+`, 'You are Echo, a world-class SEO content writer. Respond in valid JSON only.');
 
     // 3. Save to Cache (expires in 10 days)
     const expiry = new Date();
@@ -415,18 +415,18 @@ const requestIndexing = async (req, res) => {
   if (!url) return res.status(400).json({ message: 'URL required' });
 
   try {
-    // Agent 3: Linky (The Authority Builder)
+    // Agent 3: Blaze (The Speed Indexer)
     const data = await askGroq(`
-You are Linky, the Authority Builder for RankFox.
+You are Blaze, the Speed Indexer for RankFox.
 Your job is to get this URL indexed and noticed by search engines immediately: "${url}"
 
 Return JSON:
 {
   "success": true,
   "status": "Priority Submitted",
-  "message": "Linky has successfully pinged the indexing APIs. Expect crawling soon."
+  "message": "Blaze has successfully pinged the indexing APIs. Expect crawling soon."
 }
-`, 'You are Linky, the indexing specialist. Respond in valid JSON only.');
+`, 'You are Blaze, the indexing specialist. Respond in valid JSON only.');
     res.json(data);
   } catch (err) {
     console.error('Indexing request error:', err.message);
@@ -441,9 +441,9 @@ const generateGeoPages = async (req, res) => {
   if (!service || !cities) return res.status(400).json({ message: 'Service and cities required' });
 
   try {
-    // Agent 4: Visi (The GEO Specialist)
+    // Agent 4: Nova (The GEO Specialist)
     const data = await askGroq(`
-You are Visi, the GEO Specialist for RankFox.
+You are Nova, the GEO Specialist for RankFox.
 Your job is to optimize the service: "${service}" for the target cities: ${cities}.
 We need content that wins in Generative Engine Optimization (GEO) for ChatGPT and Gemini.
 
@@ -461,7 +461,7 @@ Return JSON with this exact shape:
     }
   ]
 }
-`, 'You are Visi, the expert in Generative Engine Optimization. Respond in valid JSON only.');
+`, 'You are Nova, the expert in Generative Engine Optimization. Respond in valid JSON only.');
     res.json(data);
   } catch (err) {
     console.error('Geo error:', err.message);

@@ -3,30 +3,30 @@ import { ShieldCheck, Zap, Globe, Link as LinkIcon } from 'lucide-react';
 
 const AGENTS = [
   {
-    name: 'Sly',
-    role: 'Stealth Strategist',
-    desc: 'Analyzes competitor weaknesses and builds mathematical SEO blueprints.',
-    icon: <ShieldCheck size={20} color="#f97316" />,
-    color: '#fff7ed'
+    name: 'Rexo',
+    role: 'SEO Strategist',
+    desc: 'The leader of the pack. He analyzes high-level data and builds the ultimate ranking strategy.',
+    icon: <ShieldCheck size={20} color="#3b82f6" />,
+    color: '#eff6ff'
   },
   {
-    name: 'Wordy',
+    name: 'Echo',
     role: 'Content Artisan',
-    desc: 'Crafts high-perplexity, human-sounding content that crushes AI detectors.',
+    desc: 'Master of words. He crafts human-like content that resonates with both users and search engines.',
     icon: <Zap size={20} color="#8b5cf6" />,
     color: '#f5f3ff'
   },
   {
-    name: 'Linky',
-    role: 'Authority Builder',
-    desc: 'Manages high-DA link placement and instant indexing requests.',
-    icon: <LinkIcon size={20} color="#3b82f6" />,
-    color: '#eff6ff'
+    name: 'Blaze',
+    role: 'Speed Indexer',
+    desc: 'Handles instant indexing and authority building. He makes sure your site is noticed fast.',
+    icon: <LinkIcon size={20} color="#f97316" />,
+    color: '#fff7ed'
   },
   {
-    name: 'Visi',
+    name: 'Nova',
     role: 'GEO Specialist',
-    desc: 'Optimizes your brand for AI answers in ChatGPT, Gemini, and Perplexity.',
+    desc: 'The intelligence expert. She optimizes your content for AI Answer Engines (ChatGPT/Gemini).',
     icon: <Globe size={20} color="#10b981" />,
     color: '#ecfdf5'
   }
@@ -36,7 +36,7 @@ export default function FoxPackTeam() {
   return (
     <div style={{ marginTop: 24 }}>
       <div className="section-title" style={{ fontSize: 16, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-        🦊 Meet the Fox Pack <span className="keyword-badge badge-blue" style={{ fontSize: 10 }}>Active</span>
+        🦊 Meet the Prodigy Pack <span className="keyword-badge badge-blue" style={{ fontSize: 10 }}>Active</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
         {AGENTS.map(agent => (
