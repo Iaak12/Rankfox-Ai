@@ -203,9 +203,17 @@ function OurPlansTab() {
 
 /* ─── Domain Manager Tab ─── */
 function DomainManagerTab() {
-  const [domains, setDomains] = useState(['talentbattle.in']);
+  const [domains, setDomains] = useState(() => {
+    const saved = localStorage.getItem('user_domains');
+    return saved ? JSON.parse(saved) : ['talentbattle.in'];
+  });
   const [newDomain, setNewDomain] = useState('');
   const [adding, setAdding] = useState(false);
+
+  // Sync to localStorage whenever domains change
+  useEffect(() => {
+    localStorage.setItem('user_domains', JSON.stringify(domains));
+  }, [domains]);
 
   const addDomain = () => {
     const d = newDomain.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -216,7 +224,11 @@ function DomainManagerTab() {
     setAdding(false);
   };
 
-  const removeDomain = (d) => setDomains(prev => prev.filter(x => x !== d));
+  const removeDomain = (d) => {
+    if (window.confirm(`Are you sure you want to remove ${d}?`)) {
+      setDomains(prev => prev.filter(x => x !== d));
+    }
+  };
 
   return (
     <div className="acc-section">
