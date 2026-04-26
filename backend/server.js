@@ -33,21 +33,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/faqs', faqRoutes);
 
-// Direct Test Route
-app.put('/api/test-access/:id', async (req, res) => {
-  console.log('Test route hit for ID:', req.params.id);
-  res.json({ message: 'Test route working', id: req.params.id });
-});
-
 // Root route
 app.get('/', (req, res) => {
-  res.send('RankFox API - DEBUG VERSION 2.0 IS LIVE');
-});
-
-// 404 Handler
-app.use((req, res) => {
-  console.log(`404 - Not Found: ${req.method} ${req.url}`);
-  res.status(404).json({ message: `Route ${req.method} ${req.url} not found` });
+  res.send('RankFox API is running...');
 });
 
 const PORT = process.env.PORT || 5000;

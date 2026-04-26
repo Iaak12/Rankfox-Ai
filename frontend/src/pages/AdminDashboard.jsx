@@ -141,9 +141,14 @@ export default function AdminDashboard() {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      const { data } = await axios.put(`http://localhost:5000/api/test-access/${userId}`, {}, config);
+      // Point back to the real admin route
+      const { data } = await axios.put(`http://localhost:5000/api/admin/users/access/${userId}`, {}, config);
       console.log('Toggle success:', data);
-      setUsers(users.map(u => u._id === userId ? data : u));
+      
+      // Ensure data is the full user object
+      if (data._id) {
+        setUsers(users.map(u => u._id === userId ? data : u));
+      }
     } catch (err) {
       console.error('Toggle error:', err);
       alert('Error: ' + (err.response?.data?.message || err.message));
