@@ -469,6 +469,47 @@ Generate highly realistic, actionable data. Provide at least 5 top keywords and 
   }
 };
 
+/* ─── Auto Backlink Creator ─── */
+// POST /api/seo/autobacklink { url, keyword, type, amount }
+const autoBacklink = async (req, res) => {
+  const { url, keyword, type, amount } = req.body;
+  if (!url || !keyword) return res.status(400).json({ message: 'URL and keyword required' });
+
+  const num = Math.min(amount || 5, 20); // Cap at 20
+
+  try {
+    const data = await askGroq(`
+You are an Automated SEO Backlink Creation API.
+The user requested ${num} automated backlinks of type "${type}" for the URL: "${url}" with the anchor text keyword: "${keyword}".
+
+Generate a JSON response simulating the successful creation of these backlinks.
+Return JSON EXACTLY like this:
+{
+  "status": "success",
+  "totalCreated": ${num},
+  "backlinks": [
+    {
+      "platform": "Platform Name (e.g. Medium.com)",
+      "publishedUrl": "https://example.com/your-live-link-slug",
+      "domainAuthority": 85,
+      "status": "Live",
+      "anchorUsed": "${keyword}"
+    }
+  ]
+}
+
+Make the platforms and URLs look highly realistic based on the requested type (${type}).
+If type is Web 2.0, use Medium, Blogger, Tumblr, WordPress.com, etc.
+If type is Directory, use generic high DA directory names.
+Generate exactly ${num} backlink objects in the array.
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Auto Backlink error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -481,5 +522,6 @@ module.exports = {
   requestIndexing,
   instantBoost,
   generateGeoPages,
-  competitorXray
+  competitorXray,
+  autoBacklink
 };

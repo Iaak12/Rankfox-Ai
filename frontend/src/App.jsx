@@ -16,6 +16,7 @@ import SiteAudit from './pages/SiteAudit';
 import PageOptimizer from './pages/PageOptimizer';
 import GeoOptimizer from './pages/GeoOptimizer';
 import CompetitorXRay from './pages/CompetitorXRay';
+import AutoBacklink from './pages/AutoBacklink';
 import Landing from './pages/Landing';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
@@ -37,6 +38,7 @@ const PAGE_TITLES = {
   '/dashboard/keywords': 'Keyword Research',
   '/dashboard/competitor': 'Competitor X-Ray',
   '/dashboard/links': 'Link Builder',
+  '/dashboard/autobacklink': 'Auto Backlink',
   '/dashboard/technical': 'Technical Issues',
   '/dashboard/boost': 'Instant Boost',
   '/dashboard/audit': 'Site Audit',
@@ -180,6 +182,7 @@ function DashboardLayout() {
             <Route path="/keywords" element={<KeywordResearch />} />
             <Route path="/competitor" element={<CompetitorXRay />} />
             <Route path="/links" element={<LinkBuilder />} />
+            <Route path="/autobacklink" element={<AutoBacklink />} />
             <Route path="/technical" element={<TechnicalIssues />} />
             <Route path="/boost" element={<InstantBoost />} />
             <Route path="/audit" element={<SiteAudit />} />
