@@ -18,36 +18,47 @@ export default function Products() {
           </div>
           
           <div className="features-grid">
-            {/* Feature 1: Affylo */}
+            {/* Feature 1: Rexo */}
             <div className="feature-col">
               <div className="feature-img-wrap">
-                <img src="/feature_affylo.png" alt="Affylo Tracking" />
+                <img src="/feature_rexo.png" alt="Rexo SEO" />
               </div>
-              <h3 className="feature-title">Affylo</h3>
+              <h3 className="feature-title">Rexo</h3>
               <p className="feature-desc">
-                With advanced monitoring and analytics, Affylo tracks affiliate performance, brand mentions, and partnership opportunities across AI platforms — including ChatGPT, Gemini, Perplexity, and Google AI Overviews — while ensuring your affiliate links are properly attributed.
+                The Lead SEO Strategist. Rexo analyzes competitor gaps and builds mathematical blueprints for ranking dominance, ensuring your site is perfectly structured for modern search engine algorithms.
               </p>
             </div>
             
-            {/* Feature 2: Growli */}
+            {/* Feature 2: Nova */}
             <div className="feature-col">
               <div className="feature-img-wrap">
-                <img src="/feature_growli.png" alt="Growli GEO" />
+                <img src="/feature_nova.png" alt="Nova GEO" />
               </div>
-              <h3 className="feature-title">Growli</h3>
+              <h3 className="feature-title">Nova</h3>
               <p className="feature-desc">
-                Specialized in Generative Engine Optimization (GEO), Growli continuously monitors brand mentions and citations across leading AI platforms — including ChatGPT, Gemini, Perplexity, and Google AI Overviews — while providing actionable insights to boost your visibility.
+                GEO Intelligence Expert. Specialized in Generative Engine Optimization (GEO) to ensure your brand is the #1 choice and cited source within AI answers like ChatGPT, Gemini, and Perplexity.
               </p>
             </div>
 
-            {/* Feature 3: Pyro */}
+            {/* Feature 3: Blaze */}
             <div className="feature-col">
               <div className="feature-img-wrap">
-                <img src="/feature_pyro.png" alt="Pyro Analytics" />
+                <img src="/feature_blaze.png" alt="Blaze Indexing" />
               </div>
-              <h3 className="feature-title">Pyro</h3>
+              <h3 className="feature-title">Blaze</h3>
               <p className="feature-desc">
-                Equipped with real-time monitoring capabilities, Pyro tracks how major AI platforms — including ChatGPT, Gemini, Perplexity, and Google AI Overviews — describe, and position your brand across conversational responses, allowing you to react instantly to changes in sentiment.
+                Speed Indexing Specialist. Blaze handles high-authority link building and priorities your site in indexing queues to make sure your new content gets noticed by Google in record time.
+              </p>
+            </div>
+
+            {/* Feature 4: Echo */}
+            <div className="feature-col">
+              <div className="feature-img-wrap">
+                <img src="/feature_echo.png" alt="Echo Content" />
+              </div>
+              <h3 className="feature-title">Echo</h3>
+              <p className="feature-desc">
+                The Content Artisan. Echo crafts human-first, high-perplexity content that resonates with both users and AI detectors, delivering 100% original articles that rank and convert.
               </p>
             </div>
           </div>
