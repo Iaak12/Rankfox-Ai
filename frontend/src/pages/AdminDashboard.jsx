@@ -15,7 +15,8 @@ import {
   Moon,
   ChevronRight,
   UserCheck,
-  Trash2
+  Trash2,
+  Zap
 } from 'lucide-react';
 import './AdminDashboard.css';
 
