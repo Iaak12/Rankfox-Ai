@@ -9,12 +9,15 @@ const getStatus = async (req, res) => {
 
     const integrations = user.integrations || {};
     
-    // Return only the connection status, not the raw tokens
     res.json({
       medium: !!integrations.medium?.connected,
       blogger: !!integrations.blogger?.connected,
       tumblr: !!integrations.tumblr?.connected,
       wordpress: !!integrations.wordpress?.connected,
+      gsc: !!integrations.gsc?.connected,
+      ga: !!integrations.ga?.connected,
+      ahrefs: !!integrations.ahrefs?.connected,
+      semrush: !!integrations.semrush?.connected,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -22,7 +25,6 @@ const getStatus = async (req, res) => {
 };
 
 // POST /api/integrations/connect/:platform
-// Save credentials and connect a platform
 const connectIntegration = async (req, res) => {
   try {
     const { platform } = req.params;
@@ -31,21 +33,17 @@ const connectIntegration = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (!user.integrations) {
-      user.integrations = {};
-    }
+    if (!user.integrations) user.integrations = {};
 
     if (platform === 'wordpress') {
       user.integrations.wordpress = { connected: true, url, username, appPassword };
-    } else if (['medium', 'blogger', 'tumblr'].includes(platform)) {
+    } else if (['medium', 'blogger', 'tumblr', 'gsc', 'ga', 'ahrefs', 'semrush'].includes(platform)) {
       user.integrations[platform] = { connected: true, token };
     } else {
-      return res.status(400).json({ message: 'Unknown platform' });
+      return res.status(400).json({ message: 'Unknown platform: ' + platform });
     }
 
     await user.save();
-    
-    // Return updated status
     res.json({ success: true, platform });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -53,7 +51,6 @@ const connectIntegration = async (req, res) => {
 };
 
 // POST /api/integrations/disconnect/:platform
-// Remove credentials and disconnect a platform
 const disconnectIntegration = async (req, res) => {
   try {
     const { platform } = req.params;

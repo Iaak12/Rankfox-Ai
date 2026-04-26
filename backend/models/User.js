@@ -37,7 +37,11 @@ const userSchema = new mongoose.Schema({
     medium: { connected: { type: Boolean, default: false }, token: String },
     blogger: { connected: { type: Boolean, default: false }, token: String },
     tumblr: { connected: { type: Boolean, default: false }, token: String },
-    wordpress: { connected: { type: Boolean, default: false }, url: String, username: String, appPassword: String }
+    wordpress: { connected: { type: Boolean, default: false }, url: String, username: String, appPassword: String },
+    gsc: { connected: { type: Boolean, default: false }, token: String },
+    ga: { connected: { type: Boolean, default: false }, token: String },
+    ahrefs: { connected: { type: Boolean, default: false }, token: String },
+    semrush: { connected: { type: Boolean, default: false }, token: String }
   }
 }, {
   timestamps: true,
