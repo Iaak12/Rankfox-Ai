@@ -1,37 +1,49 @@
-import React, { useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
-
-const TRAFFIC_DATA = [
-  { date: 'Apr 1', traffic: 2100, impressions: 38000 },
-  { date: 'Apr 5', traffic: 3400, impressions: 52000 },
-  { date: 'Apr 9', traffic: 2800, impressions: 61000 },
-  { date: 'Apr 13', traffic: 4200, impressions: 74000 },
-  { date: 'Apr 17', traffic: 3900, impressions: 68000 },
-  { date: 'Apr 21', traffic: 5100, impressions: 89000 },
-  { date: 'Apr 25', traffic: 6200, impressions: 99000 },
-];
-
-const PAGE_DATA = [
-  { page: 'TCS NQT Guide', clicks: 3200, impressions: 48000, ctr: 6.7 },
-  { page: 'Flipkart Grid', clicks: 2800, impressions: 41000, ctr: 6.8 },
-  { page: 'Aptitude Qs', clicks: 2100, impressions: 38000, ctr: 5.5 },
-  { page: 'Cloud Cert', clicks: 1900, impressions: 29000, ctr: 6.6 },
-  { page: 'Python DS', clicks: 4100, impressions: 62000, ctr: 6.6 },
-];
+import React, { useState, useEffect } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { seoApi } from '../utils/seoApi';
 
 export default function Insights() {
   const [period, setPeriod] = useState('28 Days');
   const filters = ['7 Days', '28 Days', '180 Days'];
+  
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInsights = async () => {
+      setLoading(true);
+      try {
+        const res = await seoApi('insights', { domain: 'rankfox.ai' });
+        setData(res);
+      } catch (e) {
+        alert('Failed to load insights: ' + e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInsights();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="page-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', flexDirection: 'column' }}>
+        <span className="spinner" style={{ width: 40, height: 40, borderWidth: 4, borderColor: '#e5e7eb', borderTopColor: '#6c47ff' }}></span>
+        <div style={{ marginTop: 20, color: '#6b7280', fontSize: 15 }}>AI is analyzing search console data...</div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   return (
     <div className="page-content">
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 20 }}>
         {[
-          { label: 'Total Traffic', value: '18.6K', icon: '🌀', color: '#6c47ff' },
-          { label: 'Total Impressions', value: '463.6K', icon: '👁', color: '#0ea5e9' },
-          { label: 'Avg. CTR', value: '6.4%', icon: '📈', color: '#16a34a' },
-          { label: 'Avg. Position', value: '12.3', icon: '🎯', color: '#f59e0b' },
+          { label: 'Total Traffic', value: data.global?.totalTraffic, icon: '🌀', color: '#6c47ff' },
+          { label: 'Total Impressions', value: data.global?.totalImpressions, icon: '👁', color: '#0ea5e9' },
+          { label: 'Avg. CTR', value: data.global?.avgCtr, icon: '📈', color: '#16a34a' },
+          { label: 'Avg. Position', value: data.global?.avgPosition, icon: '🎯', color: '#f59e0b' },
         ].map(s => (
           <div key={s.label} className="card" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <span style={{ fontSize: 28 }}>{s.icon}</span>
@@ -54,7 +66,7 @@ export default function Insights() {
       <div className="card" style={{ marginBottom: 18 }}>
         <div className="card-title">Traffic & Impressions Over Time</div>
         <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={TRAFFIC_DATA}>
+          <AreaChart data={data.trafficData}>
             <defs>
               <linearGradient id="gTraffic" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#6c47ff" stopOpacity={0.2}/>
@@ -78,11 +90,11 @@ export default function Insights() {
         <div className="table-header" style={{ gridTemplateColumns: '2fr 1fr 1fr 80px' }}>
           <span>Page</span><span>Clicks</span><span>Impressions</span><span>CTR</span>
         </div>
-        {PAGE_DATA.map((row, i) => (
+        {data.topPages?.map((row, i) => (
           <div key={i} className="table-row" style={{ gridTemplateColumns: '2fr 1fr 1fr 80px' }}>
             <span style={{ fontSize: 13, fontWeight: 500 }}>{row.page}</span>
-            <span style={{ fontSize: 13, color: '#6c47ff', fontWeight: 600 }}>{row.clicks.toLocaleString()}</span>
-            <span style={{ fontSize: 13, color: '#6b7280' }}>{row.impressions.toLocaleString()}</span>
+            <span style={{ fontSize: 13, color: '#6c47ff', fontWeight: 600 }}>{row.clicks?.toLocaleString()}</span>
+            <span style={{ fontSize: 13, color: '#6b7280' }}>{row.impressions?.toLocaleString()}</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: '#16a34a' }}>{row.ctr}%</span>
           </div>
         ))}

@@ -9,6 +9,7 @@ const {
   contentIdeas,
   linkOpportunities,
   technicalAnalysis,
+  generateInsights,
 } = require('../controllers/seoController');
 
 router.post('/keywords',   protect, keywordResearch);
@@ -18,5 +19,6 @@ router.post('/audit',      protect, siteAudit);
 router.post('/ideas',      protect, contentIdeas);
 router.post('/links',      protect, linkOpportunities);
 router.post('/technical',  protect, technicalAnalysis);
+router.post('/insights',   protect, generateInsights);
 
 module.exports = router;

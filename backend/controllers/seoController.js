@@ -285,6 +285,51 @@ Generate 10-12 realistic technical issues.
   }
 };
 
+/* ─── Insights / Mock Search Console ─── */
+// POST /api/seo/insights  { domain }
+const generateInsights = async (req, res) => {
+  const { domain } = req.body;
+  
+  try {
+    const data = await askGroq(`
+You are an expert SEO data analyst.
+Generate realistic mock Google Search Console data for the website: "${domain || 'a tech blog'}" over a 7-day period.
+
+Respond with ONLY a JSON object exactly matching this structure:
+{
+  "global": {
+    "totalTraffic": "18.6K",
+    "totalImpressions": "463.6K",
+    "avgCtr": "6.4%",
+    "avgPosition": 12.3
+  },
+  "trafficData": [
+    { "date": "Apr 1", "traffic": 2100, "impressions": 38000 },
+    { "date": "Apr 2", "traffic": 2400, "impressions": 42000 },
+    { "date": "Apr 3", "traffic": 2200, "impressions": 39000 },
+    { "date": "Apr 4", "traffic": 3100, "impressions": 48000 },
+    { "date": "Apr 5", "traffic": 3400, "impressions": 52000 },
+    { "date": "Apr 6", "traffic": 2900, "impressions": 45000 },
+    { "date": "Apr 7", "traffic": 3600, "impressions": 55000 }
+  ],
+  "topPages": [
+    { "page": "Home", "clicks": 3200, "impressions": 48000, "ctr": 6.7 },
+    { "page": "About", "clicks": 2800, "impressions": 41000, "ctr": 6.8 },
+    { "page": "Services", "clicks": 2100, "impressions": 38000, "ctr": 5.5 },
+    { "page": "Blog", "clicks": 1900, "impressions": 29000, "ctr: 6.6 },
+    { "page": "Contact", "clicks": 4100, "impressions": 62000, "ctr": 6.6 }
+  ]
+}
+
+Ensure the numbers look realistic and varied. The "trafficData" array must have exactly 7 items with sequential dates. The "topPages" array must have exactly 5 items relevant to the domain.
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Insights error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -293,4 +338,5 @@ module.exports = {
   contentIdeas,
   linkOpportunities,
   technicalAnalysis,
+  generateInsights,
 };
