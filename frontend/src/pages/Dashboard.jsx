@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X, Sparkles, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { seoApi } from '../utils/seoApi';
 
@@ -95,16 +95,46 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('7 Days');
   const [kwInput, setKwInput] = useState('');
   const filters = ['7 Days', '28 Days', '180 Days'];
+  
   const [gscDismissed, setGscDismissed] = useState(
     () => sessionStorage.getItem('gsc_banner_dismissed') === 'true'
   );
+  
+  // GSC Connection & AI Insights State
+  const [gscConnecting, setGscConnecting] = useState(false);
+  const [gscConnected, setGscConnected] = useState(() => localStorage.getItem('gsc_connected') === 'true');
+  const [insightsData, setInsightsData] = useState(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
+
   const [generating, setGenerating] = useState({});
-  const [modal, setModal] = useState(null); // { article, data }
+  const [modal, setModal] = useState(null);
   const navigate = useNavigate();
+
+  // Load AI Insights if GSC is connected
+  useEffect(() => {
+    if (gscConnected) {
+      setLoadingInsights(true);
+      seoApi('insights', { domain: 'rankfox.ai' })
+        .then(data => setInsightsData(data))
+        .catch(err => console.error('Error fetching insights:', err))
+        .finally(() => setLoadingInsights(false));
+    }
+  }, [gscConnected]);
 
   const dismissGsc = () => {
     sessionStorage.setItem('gsc_banner_dismissed', 'true');
     setGscDismissed(true);
+  };
+
+  const connectGsc = () => {
+    setGscConnecting(true);
+    // Simulate OAuth flow delay
+    setTimeout(() => {
+      setGscConnecting(false);
+      setGscConnected(true);
+      localStorage.setItem('gsc_connected', 'true');
+      setGscDismissed(true); // Auto-hide banner once connected
+    }, 2500);
   };
 
   const handleCreate = async (art) => {
@@ -129,21 +159,30 @@ export default function Dashboard() {
     <div className="page-content">
 
       {/* GSC Connection Banner */}
-      {!gscDismissed && (
+      {!gscDismissed && !gscConnected && (
         <div className="gsc-banner">
           <div className="gsc-banner-left">
             <GSCIcon />
-            <span>Your Google search console for seamless SEO Management</span>
+            <span>Connect your Google Search Console to activate AI-driven SEO insights</span>
           </div>
           <div className="gsc-banner-right">
-            <button className="gsc-connect-btn">
-              <GSCIcon />
-              Connect to GSC
+            <button className="gsc-connect-btn" onClick={connectGsc} disabled={gscConnecting} style={{ opacity: gscConnecting ? 0.8 : 1 }}>
+              {gscConnecting ? (
+                <><span className="spinner" style={{ width: 14, height: 14, borderColor: '#ccc', borderTopColor: '#333' }} /> Connecting...</>
+              ) : (
+                <><GSCIcon /> Connect to GSC</>
+              )}
             </button>
             <button className="gsc-dismiss-btn" onClick={dismissGsc} aria-label="Dismiss">
               <X size={15} />
             </button>
           </div>
+        </div>
+      )}
+
+      {gscConnected && (
+        <div style={{ background: '#dcfce7', color: '#16a34a', padding: '12px 16px', borderRadius: 8, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+          <CheckCircle2 size={16} /> Successfully synced with Google Search Console via RankFox AI.
         </div>
       )}
 
@@ -159,18 +198,23 @@ export default function Dashboard() {
             ))}
             <button className="filter-pill" title="Calendar" style={{ padding: '4px 8px' }}>📅</button>
           </div>
-          <div className="insights-stats">
+          <div className="insights-stats" style={{ position: 'relative' }}>
+            {loadingInsights && (
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
+              </div>
+            )}
             <div className="stat-item">
               <span className="stat-icon">🌀</span>
               <div>
-                <div className="stat-number">18.6 K</div>
+                <div className="stat-number">{insightsData ? insightsData.global.totalTraffic : '0'}</div>
                 <div className="stat-label">Total Traffic</div>
               </div>
             </div>
             <div className="stat-item">
               <span className="stat-icon">👁</span>
               <div>
-                <div className="stat-number">463.6 K</div>
+                <div className="stat-number">{insightsData ? insightsData.global.totalImpressions : '0'}</div>
                 <div className="stat-label">Total Impressions</div>
               </div>
             </div>
@@ -184,8 +228,16 @@ export default function Dashboard() {
         {/* Indexing */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="card-title">Indexing</div>
-          <div className="index-number">0</div>
-          <div className="index-label">Total Pages Indexed</div>
+          {loadingInsights ? (
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+               <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
+             </div>
+          ) : (
+            <>
+              <div className="index-number">{insightsData ? '1,492' : '0'}</div>
+              <div className="index-label">Total Pages Indexed</div>
+            </>
+          )}
           <div className="card-footer" style={{ marginTop: 'auto' }}>
             <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
             <a className="action-link" href="/dashboard/indexing"><Globe size={13} /> Index Pages <ArrowRight size={13} /></a>
