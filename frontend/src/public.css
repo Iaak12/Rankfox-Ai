@@ -156,37 +156,43 @@
 }
 
 .features-grid {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 320px; /* Width of each agent card */
+  display: flex;
   gap: 32px;
   max-width: 1400px;
   margin: 0 auto;
   overflow-x: auto;
-  padding-bottom: 30px;
+  padding-bottom: 40px; /* Space for scroll indicator if visible */
   scroll-snap-type: x mandatory;
-  scrollbar-width: none; /* Hide scrollbar for Chrome/Safari */
-  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
 }
 
 .features-grid::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome/Safari */
+  display: none;
 }
 
 .feature-col {
+  flex: 0 0 320px; /* Fixed width, do not grow or shrink */
   display: flex;
   flex-direction: column;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
 }
 
 .feature-img-wrap {
   width: 100%;
-  aspect-ratio: 1/1; /* Square icons look better in carousel */
+  aspect-ratio: 1/1;
   border-radius: 24px;
   overflow: hidden;
   margin-bottom: 24px;
   background: #111;
   border: 1px solid #222;
+  transition: transform 0.3s ease;
+}
+
+.feature-col:hover .feature-img-wrap {
+  transform: translateY(-8px);
+  border-color: #3b82f6;
 }
 
 .feature-img-wrap img {
