@@ -14,26 +14,28 @@ function getGroq() {
 }
 
 /* ─── Helper: call Groq and parse JSON back ─── */
-async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond in JSON format.') {
+async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond in JSON format.', model = 'llama-3.3-70b-versatile') {
   const groqClient = getGroq();
-  const chat = await groqClient.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    response_format: { type: "json_object" },
-    messages: [
-      { role: 'system', content: systemMsg },
-      { role: 'user', content: prompt }
-    ],
-    temperature: 0.4,
-    max_tokens: 3000,
-  });
-  const raw = chat.choices[0]?.message?.content || '{}';
   try {
+    const chat = await groqClient.chat.completions.create({
+      model: model,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: 'system', content: systemMsg },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.4,
+      max_tokens: 3000,
+    });
+    const raw = chat.choices[0]?.message?.content || '{}';
     return JSON.parse(raw);
   } catch (err) {
-    console.error('JSON Parse error on AI response:', err.message, '\nRaw Output:', raw);
-    // Attempt fallback cleanup just in case
-    const cleaned = raw.replace(/[\u0000-\u001F]+/g, ' '); 
-    return JSON.parse(cleaned);
+    // If rate limited or 70b fails, fallback to 8b automatically
+    if ((err.status === 429 || err.message.includes('429')) && model !== 'llama3-8b-8192') {
+      console.warn('Rate limit hit on 70b, falling back to 8b...');
+      return askGroq(prompt, systemMsg, 'llama3-8b-8192');
+    }
+    throw err;
   }
 }
 
@@ -90,6 +92,7 @@ const generateArticle = async (req, res) => {
 
     // 2. Multi-Agent Workflow
     // Agent 1: The Architect (Outlining & LSI Keywords)
+    // Using a smaller model for planning to save tokens/avoid 429 errors
     const architectPlan = await askGroq(`
 You are the Lead SEO Architect.
 The user wants an article titled: "${title}" for the keyword: "${keyword}".
@@ -99,7 +102,7 @@ Generate a structured JSON plan:
   "headings": ["H2: ...", "H3: ..."],
   "contentGapsToFill": ["gap 1", "gap 2"]
 }
-`);
+`, undefined, 'llama3-8b-8192');
 
     // Agent 2: The Writer & Editor
     const finalArticle = await askGroq(`
