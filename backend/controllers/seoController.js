@@ -1,10 +1,21 @@
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Lazy initialization so missing API key doesn't crash the whole server
+let groqInstance = null;
+function getGroq() {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY environment variable is not set on the server.');
+  }
+  if (!groqInstance) {
+    groqInstance = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groqInstance;
+}
 
 /* ─── Helper: call Groq and parse JSON back ─── */
 async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond with valid JSON only.') {
-  const chat = await groq.chat.completions.create({
+  const groqClient = getGroq();
+  const chat = await groqClient.chat.completions.create({
     model: 'llama3-70b-8192',
     messages: [
       { role: 'system', content: systemMsg },

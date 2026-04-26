@@ -1,5 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
+
+// Load env vars FIRST so controllers can access them
+dotenv.config();
+
 const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -8,9 +12,6 @@ const adminRoutes = require('./routes/adminRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const faqRoutes = require('./routes/faqRoutes');
 const seoRoutes = require('./routes/seoRoutes');
-
-// Load env vars
-dotenv.config();
 
 // Connect to database
 connectDB();
