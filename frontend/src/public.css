@@ -151,32 +151,47 @@
 
 /* FEATURES SECTION */
 .features-section {
-  padding: 100px 48px;
+  padding: 100px 0; /* Full width scroll */
   background: #000;
+  overflow: hidden;
+}
+
+.features-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .features-grid {
   display: flex;
   gap: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-  overflow-x: auto;
-  padding-bottom: 40px; /* Space for scroll indicator if visible */
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  cursor: grab;
+  width: max-content; /* Ensure it takes full width of all items */
+  padding: 20px 48px;
 }
 
-.features-grid::-webkit-scrollbar {
-  display: none;
+.ticker-animation {
+  animation: ticker 40s linear infinite;
+}
+
+.ticker-animation:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 16px)); } /* Scroll half (the first set) */
 }
 
 .feature-col {
-  flex: 0 0 320px; /* Fixed width, do not grow or shrink */
+  flex: 0 0 350px; /* Slightly wider for auto-scroll */
   display: flex;
   flex-direction: column;
-  scroll-snap-align: start;
+}
+
+@media (max-width: 768px) {
+  .feature-col { flex: 0 0 280px; }
+  .feature-title { font-size: 24px; }
+  .feature-desc { font-size: 15px; }
 }
 
 .feature-img-wrap {
@@ -187,7 +202,7 @@
   margin-bottom: 24px;
   background: #111;
   border: 1px solid #222;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .feature-col:hover .feature-img-wrap {

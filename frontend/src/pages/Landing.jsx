@@ -45,16 +45,18 @@ export default function Landing() {
         </section>
 
         <section className="features-section">
-          <div className="features-grid">
-            {features.map((f, i) => (
-              <div key={i} className="feature-col">
-                <div className="feature-img-wrap">
-                  <img src={`/feature_${f.name.toLowerCase()}.png`} alt={f.name} />
+          <div className="features-container">
+            <div className="features-grid ticker-animation">
+              {[...features, ...features].map((f, i) => (
+                <div key={i} className="feature-col">
+                  <div className="feature-img-wrap">
+                    <img src={`/feature_${f.name.toLowerCase()}.png`} alt={f.name} />
+                  </div>
+                  <h3 className="feature-title">{f.name}</h3>
+                  <p className="feature-desc">{f.desc}</p>
                 </div>
-                <h3 className="feature-title">{f.name}</h3>
-                <p className="feature-desc">{f.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
