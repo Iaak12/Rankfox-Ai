@@ -137,7 +137,7 @@ export default function AutoBacklink() {
             </div>
             
             <div style={{ background: '#1e293b', height: 6, borderRadius: 4, marginBottom: 16, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: \`\${progress}%\`, background: '#ec4899', transition: 'width 0.5s ease' }} />
+              <div style={{ height: '100%', width: `${progress}%`, background: '#ec4899', transition: 'width 0.5s ease' }} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: 240, overflowY: 'auto', fontFamily: 'monospace', fontSize: 11, color: '#34d399' }}>
