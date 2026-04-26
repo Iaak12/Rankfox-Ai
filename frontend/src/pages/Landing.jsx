@@ -21,9 +21,10 @@ export default function Landing() {
   };
 
   const features = content?.features?.items || [
-    { name: 'Affylo', desc: 'With advanced monitoring and analytics, Affylo tracks affiliate performance...' },
-    { name: 'Growli', desc: 'Specialized in Generative Engine Optimization (GEO)...' },
-    { name: 'Pyro', desc: 'Equipped with real-time monitoring capabilities...' }
+    { name: 'Rexo', desc: 'The Lead SEO Strategist. Rexo analyzes competitor gaps and builds mathematical blueprints for ranking dominance.' },
+    { name: 'Nova', desc: 'GEO Intelligence Expert. Specialized in Generative Engine Optimization to make your brand the #1 choice for AI answers.' },
+    { name: 'Blaze', desc: 'Speed Indexing Specialist. Blaze handles high-authority link building and ensures your content is indexed in seconds.' },
+    { name: 'Echo', desc: 'The Content Artisan. Echo crafts human-first, high-perplexity content that resonates with users and search engines alike.' }
   ];
 
   return (
