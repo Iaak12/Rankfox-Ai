@@ -1,4 +1,5 @@
 const Groq = require('groq-sdk');
+const Cache = require('../models/Cache');
 
 // Lazy initialization so missing API key doesn't crash the whole server
 let groqInstance = null;
@@ -72,35 +73,69 @@ Be realistic with volumes and difficulty scores based on the niche.
   }
 };
 
-/* ─── Article / Content Generator ─── */
+/* ─── Article / Content Generator (Multi-Agent Workflow & Cache) ─── */
 // POST /api/seo/generate  { title, keyword, tone? }
 const generateArticle = async (req, res) => {
   const { title, keyword, tone = 'professional' } = req.body;
   if (!title || !keyword) return res.status(400).json({ message: 'Title and keyword required' });
 
+  const cacheKey = `article_${Buffer.from(title + keyword + tone).toString('base64')}`;
+
   try {
-    const data = await askGroq(`
-You are an expert SEO content writer.
-Write a complete, high-quality SEO article.
+    // 1. Check Cache
+    const cached = await Cache.findOne({ cacheKey });
+    if (cached && cached.expiresAt > new Date()) {
+      return res.json(cached.data);
+    }
+
+    // 2. Multi-Agent Workflow
+    // Agent 1: The Architect (Outlining & LSI Keywords)
+    const architectPlan = await askGroq(`
+You are the Lead SEO Architect.
+The user wants an article titled: "${title}" for the keyword: "${keyword}".
+Generate a structured JSON plan:
+{
+  "lsiKeywords": ["lsi 1", "lsi 2", "lsi 3"],
+  "headings": ["H2: ...", "H3: ..."],
+  "contentGapsToFill": ["gap 1", "gap 2"]
+}
+`);
+
+    // Agent 2: The Writer & Editor
+    const finalArticle = await askGroq(`
+You are an expert SEO content writer and editor.
+Follow this architectural plan to write a comprehensive, 100% human-sounding article.
 
 Title: "${title}"
 Primary Keyword: "${keyword}"
 Tone: ${tone}
+LSI Keywords to naturally include: ${architectPlan.lsiKeywords.join(', ')}
+Headings to use: ${architectPlan.headings.join(', ')}
+Ensure you cover these topics to beat competitors: ${architectPlan.contentGapsToFill.join(', ')}
 
-Return JSON with this shape:
+Return JSON with this exact shape:
 {
-  "title": "final article title",
+  "title": "final optimized article title",
   "metaDescription": "compelling meta description 140-160 chars",
-  "content": "full article in markdown format with H2s, H3s, bullet points, 800-1200 words",
+  "content": "Full article in markdown format with H2s, H3s, bullet points, formatting. Write at least 800 words.",
   "wordCount": <number>,
   "readabilityScore": <number 60-100>,
   "seoScore": <number 70-100>,
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }
+`);
 
-Make the content genuinely useful, naturally use the keyword 3-5 times.
-`, 'You are a professional SEO content writer. Always respond with valid JSON only.');
-    res.json(data);
+    // 3. Save to Cache (expires in 10 days)
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + 10);
+    
+    await Cache.findOneAndUpdate(
+      { cacheKey },
+      { data: finalArticle, expiresAt: expiry },
+      { upsert: true, new: true }
+    );
+
+    res.json(finalArticle);
   } catch (err) {
     console.error('Article generation error:', err.message);
     res.status(500).json({ message: 'AI error: ' + err.message });
