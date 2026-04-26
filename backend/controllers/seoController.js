@@ -611,17 +611,24 @@ const generateBlog = async (req, res) => {
       Write a comprehensive, human-like, 1500+ word blog post.
       Use Markdown formatting (H2, H3, Bold, Lists).
       Provide a 160-character excerpt at the end.
+      Also, create a 5-word descriptive prompt for a futuristic AI/SEO themed header image.
 
       Response Format (Return as JSON):
       {
         "title": "${architect.h1}",
         "content": "Full markdown content here...",
         "excerpt": "Short engaging excerpt here...",
-        "slug": "${architect.slug}"
+        "slug": "${architect.slug}",
+        "img_prompt": "5-word futuristic image prompt"
       }
     `, 'You are a high-perplexity content writer. Always respond in JSON format.');
 
-    res.json(writing);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(writing.img_prompt + ' high resolution futuristic 3d render seo tech')}?width=1280&height=720&nologo=true`;
+    
+    res.json({
+      ...writing,
+      image: imageUrl
+    });
   } catch (err) {
     console.error('Blog generation error:', err.message);
     res.status(500).json({ message: 'AI error: ' + err.message });

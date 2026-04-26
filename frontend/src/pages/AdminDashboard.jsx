@@ -199,6 +199,7 @@ export default function AdminDashboard() {
           slug: aiData.slug,
           content: aiData.content,
           excerpt: aiData.excerpt,
+          image: aiData.image,
           isAiGenerated: true,
           status: 'Published'
         })
