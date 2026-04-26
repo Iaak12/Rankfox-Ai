@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import ContentPlanner from './pages/ContentPlanner';
@@ -80,6 +81,13 @@ function DashboardLayout() {
   const { pathname } = useLocation();
   const title = PAGE_TITLES[pathname] || 'Dashboard';
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
 
   return (
     <ProtectedRoute>
@@ -89,8 +97,30 @@ function DashboardLayout() {
           <div className="topbar">
             <h1>{title}</h1>
             <div className="topbar-right">
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{user.email}</div>
-              <div className="user-avatar" title="Profile">{user.name?.charAt(0).toUpperCase()}</div>
+              <div 
+                className="profile-trigger" 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                <div style={{ fontSize: 13, color: '#6b7280' }}>{user.email}</div>
+                <div className="user-avatar">{user.name?.charAt(0).toUpperCase()}</div>
+                
+                {showProfileMenu && (
+                  <div className="profile-dropdown">
+                    <div className="dropdown-header">
+                      <div className="user-initials">{user.name?.charAt(0).toUpperCase()}</div>
+                      <div className="user-info">
+                        <div className="user-name">{user.name}</div>
+                        <div className="user-email-small">{user.email}</div>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item logout" onClick={handleLogout}>
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
