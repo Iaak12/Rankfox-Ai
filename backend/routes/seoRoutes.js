@@ -12,7 +12,8 @@ const {
   generateInsights,
   requestIndexing,
   instantBoost,
-  generateGeoPages
+  generateGeoPages,
+  competitorXray
 } = require('../controllers/seoController');
 
 router.post('/keywords',   protect, keywordResearch);
@@ -26,5 +27,6 @@ router.post('/insights',   protect, generateInsights);
 router.post('/request-indexing', protect, requestIndexing);
 router.post('/boost',      protect, instantBoost);
 router.post('/geo',        protect, generateGeoPages);
+router.post('/competitor', protect, competitorXray);
 
 module.exports = router;

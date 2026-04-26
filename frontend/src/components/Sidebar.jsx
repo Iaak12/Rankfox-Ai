@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, BookOpen, BarChart2,
-  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search, MapPin
+  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search, MapPin, Target
 } from 'lucide-react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { icon: BarChart2,       label: 'Insights',        to: '/dashboard/insights' },
   { icon: Globe,           label: 'Indexing',        to: '/dashboard/indexing' },
   { icon: Search,          label: 'Keyword Research',to: '/dashboard/keywords' },
+  { icon: Target,          label: 'Competitor X-Ray',to: '/dashboard/competitor' },
   { icon: Link2,           label: 'Link Builder',    to: '/dashboard/links' },
   { icon: AlertTriangle,   label: 'Technical Issues',to: '/dashboard/technical' },
   { icon: Zap,             label: 'Instant Boost',   to: '/dashboard/boost' },

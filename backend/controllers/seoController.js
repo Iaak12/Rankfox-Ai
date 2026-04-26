@@ -433,6 +433,42 @@ Generate a fully unique page strategy and schema for each city listed.
   }
 };
 
+/* ─── Competitor X-Ray ─── */
+// POST /api/seo/competitor { url }
+const competitorXray = async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: 'Competitor URL required' });
+
+  try {
+    const data = await askGroq(`
+You are an expert SEO Strategist specializing in Competitor Analysis.
+Analyze the expected SEO strategy for the competitor URL: "${url}"
+
+Return JSON:
+{
+  "estimatedTraffic": "5K - 10K/mo",
+  "domainAuthority": "Medium-High",
+  "topKeywords": [
+    { "keyword": "example keyword 1", "volume": 1200, "difficulty": "Hard" },
+    { "keyword": "example keyword 2", "volume": 850, "difficulty": "Medium" },
+    { "keyword": "example keyword 3", "volume": 320, "difficulty": "Easy" }
+  ],
+  "contentGaps": [
+    "Actionable content gap idea 1",
+    "Actionable content gap idea 2"
+  ],
+  "headingStructure": ["H1: Main Title", "H2: Subtopic 1", "H2: Subtopic 2"],
+  "strategyToBeatThem": "Detailed strategy on exactly how to outrank this specific competitor by leveraging content gaps and better link building."
+}
+Generate highly realistic, actionable data. Provide at least 5 top keywords and 3 content gaps.
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Competitor X-Ray error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -444,5 +480,6 @@ module.exports = {
   generateInsights,
   requestIndexing,
   instantBoost,
-  generateGeoPages
+  generateGeoPages,
+  competitorXray
 };
