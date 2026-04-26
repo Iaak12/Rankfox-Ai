@@ -224,7 +224,7 @@ const linkOpportunities = async (req, res) => {
 
   try {
     const data = await askGroq(`
-You are an expert link-building strategist.
+You are an expert link-building strategist and cold email copywriter.
 Find link building opportunities for a ${niche} website: ${url || 'not specified'}
 
 Return JSON:
@@ -236,13 +236,13 @@ Return JSON:
       "da": <number 20-90>,
       "difficulty": "Easy"|"Medium"|"Hard",
       "approach": "how to approach this opportunity",
-      "estimatedDR": <number>
+      "emailTemplate": "A highly personalized, white-hat cold outreach email template to secure this specific link. Include Subject line."
     }
   ],
   "strategy": "overall link building strategy for this niche"
 }
 
-Generate 8-10 realistic opportunities.
+Generate 5 highly realistic opportunities with outstanding, non-spammy email templates.
 `);
     res.json(data);
   } catch (err) {
