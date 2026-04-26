@@ -292,7 +292,11 @@ const INTEGRATIONS = [
 ];
 
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_API_URL || 'https://rankfox-ai.onrender.com';
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'https://rankfox-ai.onrender.com/api';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+const API_URL = getViteApiUrl();
 
 function IntegrationsTab() {
   const [connected, setConnected] = useState({
@@ -306,9 +310,9 @@ function IntegrationsTab() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const token = localStorage.getItem('token');
         if (!token) return;
-        const { data } = await axios.get(`${API_URL}/api/integrations/status`, {
+        const { data } = await axios.get(`${API_URL}/integrations/status`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setConnected(prev => ({ ...prev, ...data }));
@@ -322,13 +326,13 @@ function IntegrationsTab() {
   }, []);
 
   const toggle = async (id) => {
-    const token = JSON.parse(localStorage.getItem('user'))?.token;
+    const token = localStorage.getItem('token');
     if (!token) return alert('Please login first to connect APIs.');
 
     if (connected[id]) {
       setConnecting(c => ({ ...c, [id]: true }));
       try {
-        await axios.post(`${API_URL}/api/integrations/disconnect/${id}`, {}, {
+        await axios.post(`${API_URL}/integrations/disconnect/${id}`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setConnected(c => ({ ...c, [id]: false }));
@@ -355,7 +359,7 @@ function IntegrationsTab() {
 
       setConnecting(c => ({ ...c, [id]: true }));
       try {
-        await axios.post(`${API_URL}/api/integrations/connect/${id}`, payload, {
+        await axios.post(`${API_URL}/integrations/connect/${id}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setConnected(c => ({ ...c, [id]: true }));
