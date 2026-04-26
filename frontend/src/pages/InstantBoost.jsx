@@ -29,7 +29,10 @@ export default function InstantBoost() {
 
   const copySchema = () => {
     if (result?.generatedSchema) {
-      navigator.clipboard.writeText(result.generatedSchema);
+      const text = typeof result.generatedSchema === 'string' 
+        ? result.generatedSchema 
+        : JSON.stringify(result.generatedSchema, null, 2);
+      navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -128,7 +131,7 @@ export default function InstantBoost() {
                     We noticed your page was missing optimal JSON-LD structured data. Paste this in your <code>&lt;head&gt;</code>:
                   </div>
                   <pre style={{ background: '#1a1a2e', color: '#a5b4fc', padding: 16, borderRadius: 8, fontSize: 11, overflowX: 'auto', fontFamily: 'monospace', lineHeight: 1.5 }}>
-                    {result.generatedSchema}
+                    {typeof result.generatedSchema === 'string' ? result.generatedSchema : JSON.stringify(result.generatedSchema, null, 2)}
                   </pre>
                 </div>
               )}
