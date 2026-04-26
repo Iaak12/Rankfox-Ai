@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles, Save, UploadCloud } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles, Save, UploadCloud, Loader } from 'lucide-react';
 import { seoApi } from '../utils/seoApi';
-
-const INITIAL_LIBRARY = [
-  { id: 1, title: 'Mastering TCS NQT: Ultimate Preparation Guide', keyword: 'TCS NQT', status: 'Published', words: 2340, date: 'Apr 3, 2024', badge: 'badge-green', content: 'This is a mock article about TCS NQT.\n\nIt covers preparation strategies...' },
-  { id: 2, title: 'Top Flipkart Grid 6.0 Strategies for Success', keyword: 'Flipkart Grid 6.0', status: 'Draft', words: 1890, date: 'Apr 7, 2024', badge: 'badge-blue', content: 'Mock content for Flipkart Grid 6.0.' },
-  { id: 3, title: 'Ace Your Aptitude Questions: Comprehensive Guide', keyword: 'Aptitude Questions', status: 'Published', words: 3120, date: 'Apr 12, 2024', badge: 'badge-purple', content: 'Mock content for Aptitude Questions.' },
-  { id: 4, title: 'Google Cloud Certification: Complete Roadmap 2024', keyword: 'Google Cloud Cert', status: 'In Review', words: 2780, date: 'Apr 15, 2024', badge: 'badge-orange', content: 'Mock content for Google Cloud Cert.' },
-];
+import axios from 'axios';
 
 const STATUS_COLORS = {
   'Published': { bg: '#dcfce7', color: '#16a34a' },
   'Draft': { bg: '#f3f4f6', color: '#6b7280' },
   'In Review': { bg: '#dbeafe', color: '#2563eb' },
 };
+
+const getViteApiUrl = () => {
+  const base = import.meta.env.VITE_API_URL || 'https://rankfox-ai.onrender.com/api';
+  return base.endsWith('/api') ? base : `${base}/api`;
+};
+const API_URL = getViteApiUrl();
 
 /* Article Generation Result Modal */
 function ArticleModal({ article_data, onClose, onSave, isSaved }) {
@@ -75,7 +75,8 @@ function ArticleModal({ article_data, onClose, onSave, isSaved }) {
 }
 
 export default function ContentLibrary() {
-  const [articles, setArticles] = useState(INITIAL_LIBRARY);
+  const [articles, setArticles] = useState([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
   const [search, setSearch] = useState('');
   
   // AI Generation State
@@ -86,6 +87,25 @@ export default function ContentLibrary() {
   const [articleResult, setArticleResult] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const fetchArticles = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const { data } = await axios.get(`${API_URL}/content/library/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setArticles(data);
+    } catch (e) {
+      console.error('Failed to fetch articles', e);
+    } finally {
+      setLoadingArticles(false);
+    }
+  };
+
   const filtered = articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
 
   const handleGenerate = async () => {
@@ -93,7 +113,6 @@ export default function ContentLibrary() {
     setGenerating(true);
     try {
       const data = await seoApi('generate', { title: topic, keyword: keyword });
-      // Attach the keyword used so we can save it later
       data._originalKeyword = keyword || topic;
       setArticleResult(data);
       setIsSaved(false);
@@ -107,38 +126,52 @@ export default function ContentLibrary() {
     }
   };
 
-  const handleSaveArticle = (data) => {
-    const newArt = {
-      id: Date.now(),
+  const handleSaveArticle = async (data) => {
+    const payload = {
       title: data.title,
       keyword: data._originalKeyword || 'AI Generated',
       status: 'Draft',
       words: data.wordCount || 0,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      badge: 'badge-purple',
       content: data.content,
       metaDescription: data.metaDescription,
       tags: data.tags,
       seoScore: data.seoScore,
       readabilityScore: data.readabilityScore
     };
-    setArticles([newArt, ...articles]);
-    setIsSaved(true);
-    alert('Article saved to library!');
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${API_URL}/content/library/save`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setArticles([res.data, ...articles]);
+      setIsSaved(true);
+      alert('Article saved to library persistently!');
+    } catch (e) {
+      alert('Failed to save article: ' + e.message);
+    }
   };
 
-  const deleteArticle = (id) => {
+  const deleteArticle = async (id) => {
     if (window.confirm('Are you sure you want to delete this article?')) {
-      setArticles(articles.filter(a => a.id !== id));
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`${API_URL}/content/library/delete/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setArticles(articles.filter(a => a._id !== id && a.id !== id));
+      } catch (e) {
+        alert('Failed to delete: ' + e.message);
+      }
     }
   };
 
   const publishToWordPress = (id) => {
-    const art = articles.find(a => a.id === id);
+    const art = articles.find(a => a._id === id || a.id === id);
     if (!art) return;
     if (window.confirm(`Push "${art.title}" directly to your connected WordPress site as a live post?`)) {
       // Simulate API call to WP REST API
-      setArticles(articles.map(a => a.id === id ? { ...a, status: 'Published' } : a));
+      setArticles(articles.map(a => (a._id === id || a.id === id) ? { ...a, status: 'Published' } : a));
       alert('Successfully published to WordPress via REST API!');
     }
   };
@@ -169,32 +202,49 @@ export default function ContentLibrary() {
         </div>
       </div>
 
-      <div className="library-grid">
-        {filtered.map(art => {
-          const sc = STATUS_COLORS[art.status];
-          return (
-            <div key={art.id} className="library-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span className="keyword-badge" style={{ background: sc.bg, color: sc.color }}>{art.status}</span>
-                <span className="text-muted">{art.date}</span>
+      {loadingArticles ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 100, gap: 16 }}>
+           <Loader className="spinner-icon" size={32} color="#2563eb" />
+           <div style={{ color: '#6b7280', fontSize: 14, fontWeight: 500 }}>Fetching your articles from the database...</div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: 60 }}>
+           <BookOpen size={40} style={{ color: '#e5e7eb', marginBottom: 12 }} />
+           <div style={{ color: '#9ca3af', fontSize: 14 }}>Your library is empty. Generate your first article!</div>
+        </div>
+      ) : (
+        <div className="library-grid">
+          {filtered.map(art => {
+            const sc = STATUS_COLORS[art.status] || STATUS_COLORS['Draft'];
+            const artId = art._id || art.id;
+            const displayDate = art.createdAt 
+              ? new Date(art.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : art.date;
+
+            return (
+              <div key={artId} className="library-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span className="keyword-badge" style={{ background: sc.bg, color: sc.color }}>{art.status}</span>
+                  <span className="text-muted">{displayDate}</span>
+                </div>
+                <div className="library-card-title">{art.title}</div>
+                <div className="library-card-meta">
+                  <span className={`keyword-badge ${art.badge || 'badge-blue'}`} style={{ fontSize: 10 }}>{art.keyword}</span>
+                  <span>•</span>
+                  <BookOpen size={11} />
+                  <span>{(art.words || 0).toLocaleString()} words</span>
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
+                  <button className="action-btn" style={{ flex: 1, justifyContent: 'center' }}><PenLine size={12} /> Edit</button>
+                  <button className="action-btn-icon" title="Preview" onClick={() => viewArticle(art)}><Eye size={13} /></button>
+                  <button className="action-btn-icon" title="Publish to WordPress" onClick={() => publishToWordPress(artId)}><UploadCloud size={13} color="#3b82f6" /></button>
+                  <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(artId)}><Trash2 size={13} /></button>
+                </div>
               </div>
-              <div className="library-card-title">{art.title}</div>
-              <div className="library-card-meta">
-                <span className={`keyword-badge ${art.badge}`} style={{ fontSize: 10 }}>{art.keyword}</span>
-                <span>•</span>
-                <BookOpen size={11} />
-                <span>{art.words.toLocaleString()} words</span>
-              </div>
-              <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
-                <button className="action-btn" style={{ flex: 1, justifyContent: 'center' }}><PenLine size={12} /> Edit</button>
-                <button className="action-btn-icon" title="Preview" onClick={() => viewArticle(art)}><Eye size={13} /></button>
-                <button className="action-btn-icon" title="Publish to WordPress" onClick={() => publishToWordPress(art.id)}><UploadCloud size={13} color="#3b82f6" /></button>
-                <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(art.id)}><Trash2 size={13} /></button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* New Article Prompt Modal */}
       {showPrompt && (
