@@ -12,12 +12,20 @@ const API_URL = getViteApiUrl();
 
 export default function Landing() {
   const [content, setContent] = React.useState(null);
+  const [faqs, setFaqs] = React.useState([]);
+  const [openIndex, setOpenIndex] = React.useState(0);
+  const [selectedPage, setSelectedPage] = React.useState('home');
 
   React.useEffect(() => {
     fetch(`${API_URL}/content/home`)
       .then(res => res.json())
       .then(data => setContent(data.sections))
       .catch(err => console.error('Error fetching home content:', err));
+
+    fetch(`${API_URL}/faqs`)
+      .then(res => res.json())
+      .then(data => setFaqs(data))
+      .catch(err => console.error('Error fetching FAQs:', err));
   }, []);
 
   const hero = content?.hero || {
@@ -155,6 +163,38 @@ export default function Landing() {
                 </div>
 
                 <Link to="/dashboard" className="price-btn" style={{ marginTop: 'auto', background: '#1e293b', color: '#fff' }}>{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="faq-section" style={{ maxWidth: 800, margin: '80px auto', padding: '0 24px' }}>
+          <div className="page-badge">FAQ</div>
+          <h2 className="about-section-title" style={{ fontSize: 40, marginTop: 16 }}>Common Questions</h2>
+          
+          <div style={{ marginTop: 64, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {faqs.length === 0 ? (
+              <p style={{ color: '#64748b' }}>No FAQs available yet.</p>
+            ) : faqs.map((faq, i) => (
+              <div key={faq._id} style={{ 
+                background: 'rgba(31, 41, 55, 0.3)', 
+                border: '1px solid rgba(255, 255, 255, 0.05)', 
+                padding: '24px 32px', 
+                borderRadius: 16,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onClick={() => setOpenIndex(openIndex === i ? -1 : i)}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontWeight: 600, fontSize: 18, color: openIndex === i ? '#fff' : '#d1d5db' }}>{faq.question}</div>
+                  <div style={{ fontSize: 24, color: '#3b82f6', transition: 'transform 0.3s ease', transform: openIndex === i ? 'rotate(45deg)' : 'rotate(0)' }}>+</div>
+                </div>
+                {openIndex === i && (
+                  <div style={{ marginTop: 12, color: '#9ca3af', lineHeight: 1.6, fontSize: 15 }}>
+                    {faq.answer}
+                  </div>
+                )}
               </div>
             ))}
           </div>
