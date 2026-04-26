@@ -98,13 +98,13 @@ export default function Pricing() {
           
           <div className="pricing-cards" style={{ alignItems: 'stretch' }}>
             {plans.map((p, i) => (
-              <div key={i} className={`price-card ${p.name.toLowerCase()}`} style={{ height: 'auto', minHeight: '800px', display: 'flex', flexDirection: 'column' }}>
-                <div className="plan-name" style={{ fontSize: 32, marginBottom: 8 }}>{p.name}</div>
-                <div className="plan-price" style={{ fontSize: 24, color: '#fff', marginBottom: 16 }}>{p.price}</div>
-                <div className="plan-desc" style={{ fontSize: 14, color: '#94a3b8', marginBottom: 32 }}>
+              <div key={i} className={`price-card ${p.name.toLowerCase()}`} style={{ height: 'auto', minHeight: '800px', display: 'flex', flexDirection: 'column', background: '#fff' }}>
+                <div className="plan-name" style={{ fontSize: 32, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{p.name}</div>
+                <div className="plan-price" style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', marginBottom: 16 }}>{p.price}</div>
+                <div className="plan-desc" style={{ fontSize: 14, color: '#64748b', marginBottom: 32 }}>
                   For growing companies who want to monitor visibility and create AEO optimized content
                 </div>
-                <div className="plan-target" style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1, color: '#cbd5e1', marginBottom: 24 }}>{p.target}</div>
+                <div className="plan-target" style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: '#94a3b8', borderBottom: '1px solid #f1f5f9', paddingBottom: 16, marginBottom: 24 }}>{p.target}</div>
                 
                 <div className="plan-features" style={{ marginBottom: 40, flex: 1 }}>
                   {p.features?.map((f, fi) => (
@@ -112,12 +112,12 @@ export default function Pricing() {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#16a34a', marginTop: 2, flexShrink: 0 }}>
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      <span style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.4 }}>{f}</span>
+                      <span style={{ fontSize: 14, color: '#475569', lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <Link to="/dashboard" className="price-btn" style={{ marginTop: 'auto' }}>{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
+                <Link to="/dashboard" className="price-btn" style={{ marginTop: 'auto', background: '#1e293b', color: '#fff' }}>{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
               </div>
             ))}
           </div>
