@@ -67,6 +67,42 @@ export default function Landing() {
           </div>
         </section>
 
+        <section className="pricing-container" style={{ paddingTop: 80, paddingBottom: 80 }}>
+          <div className="page-badge">PRICING</div>
+          <h2 className="hero-title" style={{ fontSize: 48, textAlign: 'center', marginBottom: 60 }}>Choose Your Strategy</h2>
+          
+          <div className="pricing-cards" style={{ alignItems: 'stretch' }}>
+            {[
+              { 
+                name: 'Basic', price: '$299/mo', color: '#8b5cf6', 
+                features: ['1 Service Included', '15 Keywords', '4 Blogs/mo', 'Email Support']
+              },
+              { 
+                name: 'Standard', price: '$499/mo', color: '#a3e635', 
+                features: ['2 Services Included', '40 Keywords', '8 Blogs/mo', 'Priority Support']
+              },
+              { 
+                name: 'Enterprise', price: 'CUSTOM', color: '#d9f99d', 
+                features: ['All 3 Services', 'Unlimited Tracking', 'Custom Content', 'Dedicated Manager']
+              }
+            ].map((p, i) => (
+              <div key={i} className="price-card" style={{ background: '#fff', borderRadius: 4, padding: 32, display: 'flex', flexDirection: 'column', borderTop: `6px solid ${p.color}` }}>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{p.name}</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>{p.price}</div>
+                <div style={{ flex: 1, marginBottom: 32 }}>
+                  {p.features.map((f, fi) => (
+                    <div key={fi} style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'center' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      <span style={{ fontSize: 13, color: '#64748b' }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/pricing" className="price-btn" style={{ background: '#1e293b', color: '#fff', fontSize: 13 }}>View Full Details</Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="trusted-section">
           <h2 className="trusted-title">Trusted by brands like</h2>
           <p className="trusted-subtitle">
