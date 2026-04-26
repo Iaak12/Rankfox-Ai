@@ -98,8 +98,8 @@ export default function InstantBoost() {
                       <Check size={14} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a2e' }}>{action.task}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{action.detail}</div>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a2e' }}>{typeof action.task === 'object' ? JSON.stringify(action.task) : action.task}</div>
+                      <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{typeof action.detail === 'object' ? JSON.stringify(action.detail) : action.detail}</div>
                     </div>
                   </div>
                 ))}
@@ -115,7 +115,7 @@ export default function InstantBoost() {
               <div className="card" style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 10 }}>Expected Impact</div>
                 <div style={{ padding: '12px 16px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, color: '#92400e', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Zap size={16} /> {result.estimatedImpact}
+                  <Zap size={16} /> {typeof result.estimatedImpact === 'object' ? JSON.stringify(result.estimatedImpact) : result.estimatedImpact}
                 </div>
               </div>
 
