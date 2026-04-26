@@ -111,19 +111,19 @@ Make the content genuinely useful, naturally use the keyword 3-5 times.
 // POST /api/seo/optimize  { content, keyword, url? }
 const optimizePage = async (req, res) => {
   const { content, keyword, url } = req.body;
-  if (!content || !keyword) return res.status(400).json({ message: 'Content and keyword required' });
+  if (!keyword) return res.status(400).json({ message: 'Keyword required' });
+  if (!content && !url) return res.status(400).json({ message: 'Content or URL required' });
 
-  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const wordCount = content ? content.split(/\s+/).filter(Boolean).length : 500;
 
   try {
     const data = await askGroq(`
 You are an expert on-page SEO analyst.
-Analyze this content for the keyword: "${keyword}"
+Analyze the following for the keyword: "${keyword}"
 URL: ${url || 'not provided'}
 Word count: ${wordCount}
 
-Content (first 3000 chars):
-${content.substring(0, 3000)}
+${content ? `Content (first 3000 chars):\n${content.substring(0, 3000)}` : `Simulate a detailed SEO analysis of the typical content expected at the provided URL.`}
 
 Return JSON with this exact shape:
 {

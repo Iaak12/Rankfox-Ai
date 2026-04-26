@@ -20,8 +20,12 @@ export default function PageOptimizer() {
   const wordCount = content.split(/\s+/).filter(Boolean).length;
 
   const handleAnalyze = async () => {
-    if (!content.trim() || !keyword.trim()) {
-      setError('Please enter both content and target keyword.');
+    if (!keyword.trim()) {
+      setError('Please enter a target keyword.');
+      return;
+    }
+    if (!content.trim() && !url.trim()) {
+      setError('Please enter content or a URL to analyze.');
       return;
     }
     setLoading(true);
@@ -59,7 +63,7 @@ export default function PageOptimizer() {
                 onChange={e => setKeyword(e.target.value)} style={{ maxWidth: 220 }} />
               <input className="big-input" placeholder="Page URL (optional)" value={url}
                 onChange={e => setUrl(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
-              <button className="primary-btn" onClick={handleAnalyze} disabled={loading || !content || !keyword}>
+              <button className="primary-btn" onClick={handleAnalyze} disabled={loading || !keyword || (!content && !url)}>
                 {loading ? <><span className="spinner" /> Analyzing…</> : <><Settings2 size={15} /> Analyze</>}
               </button>
             </div>
