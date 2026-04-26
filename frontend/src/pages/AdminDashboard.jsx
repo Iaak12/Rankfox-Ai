@@ -33,6 +33,8 @@ export default function AdminDashboard() {
   const [blogs, setBlogs] = useState([]);
   const [newFaq, setNewFaq] = useState({ question: '', answer: '' });
   const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
+  const [isAddingBlog, setIsAddingBlog] = useState(false);
+  const [manualBlog, setManualBlog] = useState({ title: '', slug: '', content: '', excerpt: '', category: 'AI & SEO' });
   
   const navigate = useNavigate();
 
@@ -225,6 +227,30 @@ export default function AdminDashboard() {
       if (res.ok) setBlogs(blogs.filter(b => b._id !== id));
     } catch (err) {
       alert('Delete failed');
+    }
+  };
+
+  const handleCreateManualBlog = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('adminToken');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogs`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(manualBlog)
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        setBlogs([saved, ...blogs]);
+        setIsAddingBlog(false);
+        setManualBlog({ title: '', slug: '', content: '', excerpt: '', category: 'AI & SEO' });
+        alert('Blog published successfully!');
+      }
+    } catch (err) {
+      alert('Failed to save blog');
     }
   };
 
@@ -466,71 +492,101 @@ export default function AdminDashboard() {
             </div>
           ) : activeView === 'blogs' ? (
             <div className="admin-table-card" style={{ padding: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+              {isAddingBlog ? (
                 <div>
-                  <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', margin: 0 }}>Manage Blogs</h3>
-                  <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>Create, edit, and delete your blog posts</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+                    <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', margin: 0 }}>Create New Blog</h3>
+                    <button onClick={() => setIsAddingBlog(false)} style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                  </div>
+                  <form onSubmit={handleCreateManualBlog} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    <div className="cms-field-group">
+                      <label className="cms-label">Title</label>
+                      <input className="cms-input" value={manualBlog.title} onChange={(e) => setManualBlog({...manualBlog, title: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-')})} required />
+                    </div>
+                    <div className="cms-field-group">
+                      <label className="cms-label">Slug</label>
+                      <input className="cms-input" value={manualBlog.slug} onChange={(e) => setManualBlog({...manualBlog, slug: e.target.value})} required />
+                    </div>
+                    <div className="cms-field-group">
+                      <label className="cms-label">Excerpt</label>
+                      <textarea className="cms-textarea" rows="2" value={manualBlog.excerpt} onChange={(e) => setManualBlog({...manualBlog, excerpt: e.target.value})} required />
+                    </div>
+                    <div className="cms-field-group">
+                      <label className="cms-label">Content (Markdown)</label>
+                      <textarea className="cms-textarea" rows="12" value={manualBlog.content} onChange={(e) => setManualBlog({...manualBlog, content: e.target.value})} required />
+                    </div>
+                    <button type="submit" className="save-btn" style={{ width: 'fit-content' }}>Publish Blog Post</button>
+                  </form>
                 </div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <button 
-                    onClick={handleGenerateAiBlog} 
-                    className="save-btn" 
-                    style={{ background: '#a855f7', display: 'flex', alignItems: 'center', gap: 8 }}
-                    disabled={isGeneratingBlog}
-                  >
-                    <Zap size={16} /> {isGeneratingBlog ? 'Echo is writing...' : 'Auto-Generate AI Blog'}
-                  </button>
-                  <button className="save-btn" style={{ background: '#3b82f6' }}>+ Create New Blog</button>
+              ) : (
+                <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+                  <div>
+                    <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', margin: 0 }}>Manage Blogs</h3>
+                    <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>Create, edit, and delete your blog posts</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button 
+                      onClick={handleGenerateAiBlog} 
+                      className="save-btn" 
+                      style={{ background: '#a855f7', display: 'flex', alignItems: 'center', gap: 8 }}
+                      disabled={isGeneratingBlog}
+                    >
+                      <Zap size={16} /> {isGeneratingBlog ? 'Echo is writing...' : 'Auto-Generate AI Blog'}
+                    </button>
+                    <button onClick={() => setIsAddingBlog(true)} className="save-btn" style={{ background: '#3b82f6' }}>+ Create New Blog</button>
+                  </div>
                 </div>
-              </div>
 
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Title & Slug</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {blogs.map(b => (
-                    <tr key={b._id}>
-                      <td style={{ padding: '16px 12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <FileText size={20} color="#64748b" />
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 600, color: '#1e293b' }}>{b.title}</div>
-                            <div style={{ fontSize: 12, color: '#94a3b8' }}>/{b.slug}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span style={{ 
-                          padding: '4px 10px', 
-                          borderRadius: 20, 
-                          fontSize: 11, 
-                          fontWeight: 700,
-                          background: b.status === 'Published' ? '#dcfce7' : '#f1f5f9',
-                          color: b.status === 'Published' ? '#16a34a' : '#64748b'
-                        }}>
-                          {b.status.toUpperCase()}
-                        </span>
-                        {b.isAiGenerated && <div style={{ fontSize: 10, color: '#a855f7', marginTop: 4, fontWeight: 600 }}>AI GENERATED</div>}
-                      </td>
-                      <td style={{ color: '#64748b', fontSize: 13 }}>{new Date(b.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 12 }}>
-                          <button style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}><ChevronRight size={18} /></button>
-                          <button onClick={() => handleDeleteBlog(b._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={18} /></button>
-                        </div>
-                      </td>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Title & Slug</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {blogs.map(b => (
+                      <tr key={b._id}>
+                        <td style={{ padding: '16px 12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <FileText size={20} color="#64748b" />
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 600, color: '#1e293b' }}>{b.title}</div>
+                              <div style={{ fontSize: 12, color: '#94a3b8' }}>/{b.slug}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span style={{ 
+                            padding: '4px 10px', 
+                            borderRadius: 20, 
+                            fontSize: 11, 
+                            fontWeight: 700,
+                            background: b.status === 'Published' ? '#dcfce7' : '#f1f5f9',
+                            color: b.status === 'Published' ? '#16a34a' : '#64748b'
+                          }}>
+                            {b.status.toUpperCase()}
+                          </span>
+                          {b.isAiGenerated && <div style={{ fontSize: 10, color: '#a855f7', marginTop: 4, fontWeight: 600 }}>AI GENERATED</div>}
+                        </td>
+                        <td style={{ color: '#64748b', fontSize: 13 }}>{new Date(b.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 12 }}>
+                            <button style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}><ChevronRight size={18} /></button>
+                            <button onClick={() => handleDeleteBlog(b._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </>
+              )}
             </div>
           ) : activeView === 'users' ? (
             <div className="admin-table-card" style={{ padding: '32px' }}>
