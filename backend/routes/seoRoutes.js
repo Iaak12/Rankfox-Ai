@@ -11,6 +11,7 @@ const {
   technicalAnalysis,
   generateInsights,
   requestIndexing,
+  instantBoost
 } = require('../controllers/seoController');
 
 router.post('/keywords',   protect, keywordResearch);
@@ -22,5 +23,6 @@ router.post('/links',      protect, linkOpportunities);
 router.post('/technical',  protect, technicalAnalysis);
 router.post('/insights',   protect, generateInsights);
 router.post('/request-indexing', protect, requestIndexing);
+router.post('/boost',      protect, instantBoost);
 
 module.exports = router;

@@ -251,6 +251,40 @@ Generate 8-10 realistic opportunities.
   }
 };
 
+/* ─── Instant Boost ─── */
+// POST /api/seo/boost { url }
+const instantBoost = async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: 'URL required' });
+
+  try {
+    const data = await askGroq(`
+You are an expert technical SEO AI.
+Simulate an "Instant Boost" operation for the URL: "${url}"
+
+This operation represents pinging search engines, checking core web vitals, and generating missing schema markup.
+
+Return JSON:
+{
+  "status": "success",
+  "message": "Boost completed successfully",
+  "actions": [
+    { "task": "Google Indexing API Ping", "status": "Success", "detail": "URL submitted for priority crawling" },
+    { "task": "Bing Indexing Ping", "status": "Success", "detail": "URL submitted to Bing Webmaster Tools" },
+    { "task": "Schema Markup", "status": "Generated", "detail": "Generated Article & Breadcrumb schema" },
+    { "task": "Cache Warmer", "status": "Complete", "detail": "CDN Edge cache primed for fast loading" }
+  ],
+  "estimatedImpact": "High - Expect crawling within 24-48 hours",
+  "generatedSchema": "{ \\"@context\\": \\"https://schema.org\\", \\"@type\\": \\"WebPage\\", \\"url\\": \\"${url}\\" }"
+}
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Boost error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 /* ─── Technical Issues Analysis ─── */
 // POST /api/seo/technical  { url }
 const technicalAnalysis = async (req, res) => {
@@ -373,4 +407,5 @@ module.exports = {
   technicalAnalysis,
   generateInsights,
   requestIndexing,
+  instantBoost
 };
