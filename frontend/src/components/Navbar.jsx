@@ -8,7 +8,11 @@ export default function Navbar() {
   return (
     <nav className="public-navbar">
       <Link to="/" className="public-logo" onClick={() => setIsOpen(false)}>
-        <img src="/fox_logo.png" alt="RankFox Logo" style={{ height: 42, width: 'auto', mixBlendMode: 'screen' }} />
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="#fff" style={{ flexShrink: 0 }}>
+          <path d="M12 2L4.5 9 3 22l9-3 9 3-1.5-13L12 2z"/>
+          <circle cx="9" cy="13" r="1.2" fill="#000" />
+          <circle cx="15" cy="13" r="1.2" fill="#000" />
+        </svg>
         <span>RankFox</span>
       </Link>
       
