@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, BookOpen, BarChart2,
-  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search
+  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search, MapPin
 } from 'lucide-react';
 
 const navItems = [
@@ -14,9 +14,10 @@ const navItems = [
   { icon: Search,          label: 'Keyword Research',to: '/dashboard/keywords' },
   { icon: Link2,           label: 'Link Builder',    to: '/dashboard/links' },
   { icon: AlertTriangle,   label: 'Technical Issues',to: '/dashboard/technical' },
-  { icon: Zap,             label: 'Instant Boost',   to: '/dashboard/boost', locked: true },
+  { icon: Zap,             label: 'Instant Boost',   to: '/dashboard/boost' },
   { icon: FileSearch,      label: 'Site Audit',      to: '/dashboard/audit' },
   { icon: Settings2,       label: 'Page Optimizer',  to: '/dashboard/optimizer' },
+  { icon: MapPin,          label: 'Geo Optimizer',   to: '/dashboard/geo' },
 ];
 
 export default function Sidebar() {

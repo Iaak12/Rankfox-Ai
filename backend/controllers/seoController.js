@@ -397,6 +397,42 @@ Return JSON EXACTLY like this:
   }
 };
 
+/* ─── Geo-Intelligence / Local SEO ─── */
+// POST /api/seo/geo { service, cities }
+const generateGeoPages = async (req, res) => {
+  const { service, cities } = req.body;
+  if (!service || !cities) return res.status(400).json({ message: 'Service and cities required' });
+
+  try {
+    const data = await askGroq(`
+You are an expert Local SEO Content Generator.
+I need to create hyper-local landing pages for the service: "${service}"
+Target cities: ${cities}
+
+Return JSON with this exact shape:
+{
+  "pages": [
+    {
+      "city": "Name of city",
+      "keyword": "primary local keyword",
+      "metaTitle": "Optimized meta title for this city",
+      "metaDescription": "Optimized meta description",
+      "h1": "Main H1 heading",
+      "contentOutline": ["Section 1", "Section 2", "Section 3"],
+      "schemaSnippet": "<script type=\\"application/ld+json\\">{ \\"@context\\": \\"https://schema.org\\", \\"@type\\": \\"LocalBusiness\\", \\"name\\": \\"${service} in [City]\\", \\"areaServed\\": \\"[City]\\" }</script>"
+    }
+  ]
+}
+
+Generate a fully unique page strategy and schema for each city listed.
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Geo error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -407,5 +443,6 @@ module.exports = {
   technicalAnalysis,
   generateInsights,
   requestIndexing,
-  instantBoost
+  instantBoost,
+  generateGeoPages
 };

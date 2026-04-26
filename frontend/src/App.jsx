@@ -14,6 +14,7 @@ import TechnicalIssues from './pages/TechnicalIssues';
 import InstantBoost from './pages/InstantBoost';
 import SiteAudit from './pages/SiteAudit';
 import PageOptimizer from './pages/PageOptimizer';
+import GeoOptimizer from './pages/GeoOptimizer';
 import Landing from './pages/Landing';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
@@ -38,6 +39,7 @@ const PAGE_TITLES = {
   '/dashboard/boost': 'Instant Boost',
   '/dashboard/audit': 'Site Audit',
   '/dashboard/optimizer': 'Page Optimizer',
+  '/dashboard/geo': 'Geo Optimizer',
   '/dashboard/account': 'My Account',
 };
 
@@ -179,6 +181,7 @@ function DashboardLayout() {
             <Route path="/boost" element={<InstantBoost />} />
             <Route path="/audit" element={<SiteAudit />} />
             <Route path="/optimizer" element={<PageOptimizer />} />
+            <Route path="/geo" element={<GeoOptimizer />} />
             <Route path="/account" element={<AccountSettingsRoute />} />
           </Routes>
         </div>

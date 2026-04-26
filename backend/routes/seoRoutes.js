@@ -11,7 +11,8 @@ const {
   technicalAnalysis,
   generateInsights,
   requestIndexing,
-  instantBoost
+  instantBoost,
+  generateGeoPages
 } = require('../controllers/seoController');
 
 router.post('/keywords',   protect, keywordResearch);
@@ -24,5 +25,6 @@ router.post('/technical',  protect, technicalAnalysis);
 router.post('/insights',   protect, generateInsights);
 router.post('/request-indexing', protect, requestIndexing);
 router.post('/boost',      protect, instantBoost);
+router.post('/geo',        protect, generateGeoPages);
 
 module.exports = router;
