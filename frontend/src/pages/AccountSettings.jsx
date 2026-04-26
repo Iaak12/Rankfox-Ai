@@ -269,35 +269,69 @@ function DomainManagerTab() {
 
 /* ─── Integrations Tab ─── */
 const INTEGRATIONS = [
-  { name: 'Google Search Console', desc: 'Connect GSC for indexing & traffic insights', icon: '🔍', connected: false, color: '#4285F4' },
-  { name: 'Google Analytics',      desc: 'Import GA4 traffic and engagement data',    icon: '📊', connected: false, color: '#E37400' },
-  { name: 'Ahrefs',                desc: 'Import backlink and keyword data',           icon: '🔗', connected: false, color: '#FF6B35' },
-  { name: 'Semrush',               desc: 'Sync keyword rankings and audits',           icon: '⚡', connected: false, color: '#FF642D' },
+  { id: 'gsc',     name: 'Google Search Console', desc: 'Connect GSC for indexing & traffic insights', icon: '🔍', color: '#4285F4' },
+  { id: 'ga',      name: 'Google Analytics',      desc: 'Import GA4 traffic and engagement data',    icon: '📊', color: '#E37400' },
+  { id: 'ahrefs',  name: 'Ahrefs',                desc: 'Import backlink and keyword data',           icon: '🔗', color: '#FF6B35' },
+  { id: 'semrush', name: 'Semrush',               desc: 'Sync keyword rankings and audits',           icon: '⚡', color: '#FF642D' },
 ];
 
 function IntegrationsTab() {
-  const [connected, setConnected] = useState({});
-  const toggle = (name) => setConnected(c => ({ ...c, [name]: !c[name] }));
+  const [connected, setConnected] = useState({
+    gsc: localStorage.getItem('gsc_connected') === 'true',
+    ga: localStorage.getItem('ga_connected') === 'true',
+    ahrefs: localStorage.getItem('ahrefs_connected') === 'true',
+    semrush: localStorage.getItem('semrush_connected') === 'true',
+  });
+  
+  const [connecting, setConnecting] = useState({});
+
+  const toggle = (id) => {
+    if (connected[id]) {
+      // Disconnect immediately
+      setConnected(c => ({ ...c, [id]: false }));
+      localStorage.removeItem(`${id}_connected`);
+      if (id === 'gsc') sessionStorage.removeItem('gsc_banner_dismissed');
+    } else {
+      // Simulate OAuth connection flow
+      setConnecting(c => ({ ...c, [id]: true }));
+      setTimeout(() => {
+        setConnecting(c => ({ ...c, [id]: false }));
+        setConnected(c => ({ ...c, [id]: true }));
+        localStorage.setItem(`${id}_connected`, 'true');
+      }, 2000);
+    }
+  };
+
   return (
     <div className="acc-section">
       <h2 className="acc-section-title">Integrations</h2>
       <p className="acc-section-sub">Connect your favourite tools to RankFox</p>
       <div className="integrations-list">
-        {INTEGRATIONS.map(i => (
-          <div className="integration-row" key={i.name}>
-            <span className="integration-icon">{i.icon}</span>
-            <div className="integration-info">
-              <div className="integration-name">{i.name}</div>
-              <div className="integration-desc">{i.desc}</div>
+        {INTEGRATIONS.map(i => {
+          const isConnecting = connecting[i.id];
+          const isConnected = connected[i.id];
+          return (
+            <div className="integration-row" key={i.id}>
+              <span className="integration-icon">{i.icon}</span>
+              <div className="integration-info">
+                <div className="integration-name">{i.name}</div>
+                <div className="integration-desc">{i.desc}</div>
+              </div>
+              <button
+                className={`integration-btn${isConnected ? ' connected' : ''}`}
+                onClick={() => toggle(i.id)}
+                disabled={isConnecting}
+                style={{ opacity: isConnecting ? 0.8 : 1, minWidth: 100, display: 'flex', justifyContent: 'center' }}
+              >
+                {isConnecting ? (
+                  <><span className="spinner" style={{ width: 12, height: 12, borderWidth: 2, marginRight: 6, borderColor: '#ccc', borderTopColor: '#333' }}></span> Connecting...</>
+                ) : isConnected ? (
+                  <><Check size={13} style={{ marginRight: 4 }} /> Connected</>
+                ) : 'Connect'}
+              </button>
             </div>
-            <button
-              className={`integration-btn${connected[i.name] ? ' connected' : ''}`}
-              onClick={() => toggle(i.name)}
-            >
-              {connected[i.name] ? <><Check size={13} /> Connected</> : 'Connect'}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
