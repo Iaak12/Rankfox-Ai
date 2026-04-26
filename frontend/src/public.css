@@ -157,24 +157,36 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 320px; /* Width of each agent card */
   gap: 32px;
-  max-width: 1300px;
+  max-width: 1400px;
   margin: 0 auto;
+  overflow-x: auto;
+  padding-bottom: 30px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Hide scrollbar for Chrome/Safari */
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+
+.features-grid::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
 }
 
 .feature-col {
   display: flex;
   flex-direction: column;
+  scroll-snap-align: center;
 }
 
 .feature-img-wrap {
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 1/1; /* Square icons look better in carousel */
   border-radius: 24px;
   overflow: hidden;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   background: #111;
+  border: 1px solid #222;
 }
 
 .feature-img-wrap img {
@@ -699,7 +711,7 @@
 
 /* MOBILE RESPONSIVENESS */
 @media (max-width: 1024px) {
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  /* removed override */
   .pricing-cards { grid-template-columns: repeat(2, 1fr); }
   .trusted-logos { gap: 40px; }
   .hero-title { font-size: 48px; }
@@ -728,7 +740,7 @@
   .about-watermark { display: none; } /* Hide on mobile to prevent overflow */
 
   /* Grids to Single Column */
-  .features-grid { grid-template-columns: 1fr; }
+  /* removed override */
   .pricing-cards { grid-template-columns: 1fr; }
   .footer-offices { max-width: 100%; }
   
