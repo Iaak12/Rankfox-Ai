@@ -103,7 +103,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faqs`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/faqs`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -115,9 +115,12 @@ export default function AdminDashboard() {
         const created = await res.json();
         setFaqs([...faqs, created]);
         setNewFaq({ question: '', answer: '' });
+      } else {
+        const errData = await res.json();
+        alert('Error: ' + (errData.message || res.statusText));
       }
     } catch (err) {
-      alert('Failed to add FAQ');
+      alert('Failed to add FAQ: ' + err.message);
     }
   };
 
@@ -125,13 +128,14 @@ export default function AdminDashboard() {
     if (!window.confirm('Delete this FAQ?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/faqs/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setFaqs(faqs.filter(f => f._id !== id));
+      else alert('Failed to delete FAQ');
     } catch (err) {
-      alert('Failed to delete FAQ');
+      alert('Failed to delete FAQ: ' + err.message);
     }
   };
 
