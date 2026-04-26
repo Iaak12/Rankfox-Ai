@@ -43,10 +43,11 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const headers = { 'Authorization': `Bearer ${token}` };
+        const apiBase = import.meta.env.VITE_API_URL;
         const [usersRes, contactsRes, faqsRes] = await Promise.all([
-          fetch('http://127.0.0.1:5000/api/admin/users', { headers }),
-          fetch('http://127.0.0.1:5000/api/admin/contacts', { headers }),
-          fetch('http://127.0.0.1:5000/api/faqs')
+          fetch(`${apiBase}/admin/users`, { headers }),
+          fetch(`${apiBase}/admin/contacts`, { headers }),
+          fetch(`${apiBase}/faqs`)
         ]);
 
         if (!usersRes.ok || !contactsRes.ok) throw new Error('Auth failed');
@@ -66,7 +67,7 @@ export default function AdminDashboard() {
     if (activeView === 'pageContent') {
       const fetchPageData = async () => {
         try {
-          const res = await fetch(`http://127.0.0.1:5000/api/content/${selectedPage}`);
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/content/${selectedPage}`);
           const data = await res.json();
           setPageData(data.sections);
         } catch (err) {
@@ -81,7 +82,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('adminToken');
     setIsSaving(true);
     try {
-      const res = await fetch(`http://127.0.0.1:5000/api/content/${selectedPage}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/content/${selectedPage}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export default function AdminDashboard() {
         headers: { Authorization: `Bearer ${token}` }
       };
       // Point back to the real admin route
-      const { data } = await axios.put(`http://localhost:5000/api/admin/users/access/${userId}`, {}, config);
+      const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/admin/users/access/${userId}`, {}, config);
       console.log('Toggle success:', data);
       
       // Ensure data is the full user object
