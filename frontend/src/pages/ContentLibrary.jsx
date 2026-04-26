@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { PenLine, Eye, Trash2, Plus, BookOpen } from 'lucide-react';
+import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles } from 'lucide-react';
+import { seoApi } from '../utils/seoApi';
 
 const LIBRARY = [
   { id: 1, title: 'Mastering TCS NQT: Ultimate Preparation Guide', keyword: 'TCS NQT', status: 'Published', words: 2340, date: 'Apr 3, 2024', badge: 'badge-green' },
@@ -16,11 +17,86 @@ const STATUS_COLORS = {
   'In Review': { bg: '#dbeafe', color: '#2563eb' },
 };
 
+/* Article Generation Result Modal */
+function ArticleModal({ article_data, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(article_data?.content || '');
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 760, maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.2)' }}>
+        {/* Header */}
+        <div style={{ padding: '18px 24px', borderBottom: '1px solid #f0f0f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{article_data?.title}</div>
+            <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>
+              {article_data?.wordCount} words · SEO Score: {article_data?.seoScore} · Readability: {article_data?.readabilityScore}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="action-btn" onClick={copy}>{copied ? '✓ Copied!' : <><Copy size={12} /> Copy</>}</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}><X size={18} /></button>
+          </div>
+        </div>
+
+        {/* Meta */}
+        {article_data?.metaDescription && (
+          <div style={{ padding: '10px 24px', background: '#f8f8fc', borderBottom: '1px solid #f0f0f5' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af' }}>META DESCRIPTION · </span>
+            <span style={{ fontSize: 12, color: '#374151' }}>{article_data.metaDescription}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px' }}>
+          <pre style={{ fontFamily: 'Inter', fontSize: 13, lineHeight: 1.8, color: '#1a1a2e', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {article_data?.content}
+          </pre>
+        </div>
+
+        {/* Tags */}
+        {article_data?.tags?.length > 0 && (
+          <div style={{ padding: '12px 24px', borderTop: '1px solid #f0f0f5', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {article_data.tags.map(t => (
+              <span key={t} className="keyword-badge badge-purple">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ContentLibrary() {
   const [view, setView] = useState('grid');
   const [search, setSearch] = useState('');
+  
+  // AI Generation State
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [topic, setTopic] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [articleResult, setArticleResult] = useState(null);
 
   const filtered = LIBRARY.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
+
+  const handleGenerate = async () => {
+    if (!topic.trim()) return alert("Please enter a topic");
+    setGenerating(true);
+    try {
+      const data = await seoApi('generate', { title: topic, keyword: keyword });
+      setArticleResult(data);
+      setShowPrompt(false);
+      setTopic('');
+      setKeyword('');
+    } catch (e) {
+      alert('AI Error: ' + e.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   return (
     <div className="page-content">
@@ -37,7 +113,9 @@ export default function ContentLibrary() {
             onChange={e => setSearch(e.target.value)}
             style={{ width: 220, padding: '8px 14px', fontSize: 13 }}
           />
-          <button className="primary-btn" style={{ fontSize: 13, padding: '8px 14px' }}><Plus size={14} /> New Article</button>
+          <button className="primary-btn" style={{ fontSize: 13, padding: '8px 14px' }} onClick={() => setShowPrompt(true)}>
+            <Plus size={14} /> New Article
+          </button>
         </div>
       </div>
 
@@ -66,6 +144,56 @@ export default function ContentLibrary() {
           );
         })}
       </div>
+
+      {/* New Article Prompt Modal */}
+      {showPrompt && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: 480, padding: 24, boxShadow: '0 24px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Sparkles size={18} color="#2563eb" /> AI Article Writer
+              </div>
+              <button onClick={() => setShowPrompt(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={18} /></button>
+            </div>
+            
+            <div className="form-group" style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Article Topic or Title</label>
+              <input 
+                className="big-input" 
+                placeholder="e.g. The Ultimate Guide to Technical SEO in 2024"
+                value={topic}
+                onChange={e => setTopic(e.target.value)}
+                autoFocus
+              />
+            </div>
+            
+            <div className="form-group" style={{ marginBottom: 24 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Primary Keyword (Optional)</label>
+              <input 
+                className="big-input" 
+                placeholder="e.g. technical seo guide"
+                value={keyword}
+                onChange={e => setKeyword(e.target.value)}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button className="action-btn" onClick={() => setShowPrompt(false)}>Cancel</button>
+              <button className="primary-btn" onClick={handleGenerate} disabled={generating} style={{ opacity: generating ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+                {generating ? <><span className="spinner" style={{ width: 13, height: 13, borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} /> Generating...</> : 'Generate Article'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Generated Article Result Modal */}
+      {articleResult && (
+        <ArticleModal
+          article_data={articleResult}
+          onClose={() => setArticleResult(null)}
+        />
+      )}
     </div>
   );
 }
