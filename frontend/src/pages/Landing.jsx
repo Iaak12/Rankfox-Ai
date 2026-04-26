@@ -69,35 +69,92 @@ export default function Landing() {
 
         <section className="pricing-container" style={{ paddingTop: 80, paddingBottom: 80 }}>
           <div className="page-badge">PRICING</div>
-          <h2 className="hero-title" style={{ fontSize: 48, textAlign: 'center', marginBottom: 60 }}>Choose Your Strategy</h2>
+          <h1 className="pricing-title" style={{ textAlign: 'center' }}>Affordable pricing for everyone</h1>
+          <p className="pricing-subtitle" style={{ textAlign: 'center' }}>Manage prompt libraries and optimize your flow with built-in AI tools.</p>
+          
+          <div className="pricing-toggle">
+            <span className="toggle-option active">Monthly</span>
+            <span className="toggle-option">Annualy</span>
+            <span className="toggle-badge">2 MONTHS FREE</span>
+          </div>
           
           <div className="pricing-cards" style={{ alignItems: 'stretch' }}>
             {[
               { 
-                name: 'Basic', price: '$299/mo', color: '#8b5cf6', 
-                features: ['1 Service Included', '15 Keywords', '4 Blogs/mo', 'Email Support']
+                name: 'Basic', 
+                price: '$299/month', 
+                target: 'FOR SMALL BUSINESSES & EARLY TEAMS',
+                color: '#8b5cf6',
+                features: [
+                  '1 Service Included (SEO or GEO or Local SEO)',
+                  'Up to 15 Target Keywords / Prompts',
+                  '4 New Pages or Blogs / mo',
+                  '8 Content Improvements / Refreshes / mo',
+                  '1 Competitor Audit / mo',
+                  'Technical Site Fixes (up to 5 issues / mo)',
+                  'Monthly Performance Report',
+                  'Whatsapp / Email Support',
+                  'Dedicated Kamp',
+                  'Basic Support'
+                ]
               },
               { 
-                name: 'Standard', price: '$499/mo', color: '#a3e635', 
-                features: ['2 Services Included', '40 Keywords', '8 Blogs/mo', 'Priority Support']
+                name: 'Standard', 
+                price: '$499/month', 
+                target: 'FOR GROWING D2C, SAAS, AND SERVICE BRANDS',
+                color: '#a3e635',
+                features: [
+                  'Any 2 Services (SEO + GEO / SEO + Local)',
+                  'Up to 40 Target Keywords / Prompts',
+                  '8 New Pages or Blogs / mo',
+                  '20 Content Improvements / Refreshes / mo',
+                  'Competitor Insights Dashboard',
+                  'Fix All Critical Technical SEO Issues',
+                  'Schema Setup & Optimization',
+                  'Local SEO Presence Boost (Maps, Citations, Reviews)',
+                  'Fortnightly Review Calls',
+                  'Priority Support Enterprise'
+                ]
               },
               { 
-                name: 'Enterprise', price: 'CUSTOM', color: '#d9f99d', 
-                features: ['All 3 Services', 'Unlimited Tracking', 'Custom Content', 'Dedicated Manager']
+                name: 'Enterprise', 
+                price: 'CUSTOM', 
+                target: 'FOR LARGE BRANDS, MULTI-LOCATION TEAMS, AGENCIES',
+                color: '#d9f99d',
+                features: [
+                  'All 3 Services Included (SEO + GEO + Local SEO)',
+                  'Unlimited Keywords / Prompts Tracking',
+                  'Custom Content Volume Based on Goals',
+                  'Full Technical SEO Overhaul',
+                  'GEO Strategy Across All Major AI Search Platforms',
+                  'Local SEO for Multiple Locations',
+                  'Dedicated Strategist + Account Manager',
+                  'Custom Dashboards & Integrations',
+                  'Weekly Strategy Calls',
+                  'Dedicated Manager'
+                ]
               }
             ].map((p, i) => (
-              <div key={i} className="price-card" style={{ background: '#fff', borderRadius: 4, padding: 32, display: 'flex', flexDirection: 'column', borderTop: `6px solid ${p.color}` }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{p.name}</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>{p.price}</div>
-                <div style={{ flex: 1, marginBottom: 32 }}>
-                  {p.features.map((f, fi) => (
-                    <div key={fi} style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                      <span style={{ fontSize: 13, color: '#64748b' }}>{f}</span>
+              <div key={i} className={`price-card ${p.name.toLowerCase()}`} style={{ height: 'auto', minHeight: '800px', display: 'flex', flexDirection: 'column', background: '#fff', borderTop: `6px solid ${p.color}` }}>
+                <div className="plan-name" style={{ fontSize: 32, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{p.name}</div>
+                <div className="plan-price" style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', marginBottom: 16 }}>{p.price}</div>
+                <div className="plan-desc" style={{ fontSize: 14, color: '#64748b', marginBottom: 32, textAlign: 'left' }}>
+                  For growing companies who want to monitor visibility and create AEO optimized content
+                </div>
+                <div className="plan-target" style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: '#94a3b8', borderBottom: '1px solid #f1f5f9', paddingBottom: 16, marginBottom: 24, textAlign: 'left' }}>{p.target}</div>
+                
+                <div className="plan-features" style={{ marginBottom: 40, flex: 1 }}>
+                  {p.features?.map((f, fi) => (
+                    <div key={fi} style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'flex-start' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#16a34a', marginTop: 2, flexShrink: 0 }}>
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span style={{ fontSize: 14, color: '#475569', lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
                 </div>
-                <Link to="/pricing" className="price-btn" style={{ background: '#1e293b', color: '#fff', fontSize: 13 }}>View Full Details</Link>
+
+                <Link to="/dashboard" className="price-btn" style={{ marginTop: 'auto', background: '#1e293b', color: '#fff' }}>{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
               </div>
             ))}
           </div>
