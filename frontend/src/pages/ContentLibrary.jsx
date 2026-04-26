@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles } from 'lucide-react';
+import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles, Save } from 'lucide-react';
 import { seoApi } from '../utils/seoApi';
 
-const LIBRARY = [
-  { id: 1, title: 'Mastering TCS NQT: Ultimate Preparation Guide', keyword: 'TCS NQT', status: 'Published', words: 2340, date: 'Apr 3, 2024', badge: 'badge-green' },
-  { id: 2, title: 'Top Flipkart Grid 6.0 Strategies for Success', keyword: 'Flipkart Grid 6.0', status: 'Draft', words: 1890, date: 'Apr 7, 2024', badge: 'badge-blue' },
-  { id: 3, title: 'Ace Your Aptitude Questions: Comprehensive Guide', keyword: 'Aptitude Questions', status: 'Published', words: 3120, date: 'Apr 12, 2024', badge: 'badge-purple' },
-  { id: 4, title: 'Google Cloud Certification: Complete Roadmap 2024', keyword: 'Google Cloud Cert', status: 'In Review', words: 2780, date: 'Apr 15, 2024', badge: 'badge-orange' },
-  { id: 5, title: 'Python for Data Science: Beginner to Advanced', keyword: 'Python Data Science', status: 'Published', words: 4200, date: 'Apr 18, 2024', badge: 'badge-red' },
-  { id: 6, title: 'System Design Interview: Top 20 Questions Solved', keyword: 'System Design', status: 'Draft', words: 2950, date: 'Apr 22, 2024', badge: 'badge-green' },
+const INITIAL_LIBRARY = [
+  { id: 1, title: 'Mastering TCS NQT: Ultimate Preparation Guide', keyword: 'TCS NQT', status: 'Published', words: 2340, date: 'Apr 3, 2024', badge: 'badge-green', content: 'This is a mock article about TCS NQT.\n\nIt covers preparation strategies...' },
+  { id: 2, title: 'Top Flipkart Grid 6.0 Strategies for Success', keyword: 'Flipkart Grid 6.0', status: 'Draft', words: 1890, date: 'Apr 7, 2024', badge: 'badge-blue', content: 'Mock content for Flipkart Grid 6.0.' },
+  { id: 3, title: 'Ace Your Aptitude Questions: Comprehensive Guide', keyword: 'Aptitude Questions', status: 'Published', words: 3120, date: 'Apr 12, 2024', badge: 'badge-purple', content: 'Mock content for Aptitude Questions.' },
+  { id: 4, title: 'Google Cloud Certification: Complete Roadmap 2024', keyword: 'Google Cloud Cert', status: 'In Review', words: 2780, date: 'Apr 15, 2024', badge: 'badge-orange', content: 'Mock content for Google Cloud Cert.' },
 ];
 
 const STATUS_COLORS = {
@@ -18,7 +16,7 @@ const STATUS_COLORS = {
 };
 
 /* Article Generation Result Modal */
-function ArticleModal({ article_data, onClose }) {
+function ArticleModal({ article_data, onClose, onSave, isSaved }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
     navigator.clipboard.writeText(article_data?.content || '');
@@ -32,10 +30,17 @@ function ArticleModal({ article_data, onClose }) {
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{article_data?.title}</div>
             <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>
-              {article_data?.wordCount} words · SEO Score: {article_data?.seoScore} · Readability: {article_data?.readabilityScore}
+              {article_data?.wordCount || article_data?.words} words 
+              {article_data?.seoScore && ` · SEO Score: ${article_data.seoScore}`} 
+              {article_data?.readabilityScore && ` · Readability: ${article_data.readabilityScore}`}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
+            {onSave && !isSaved && (
+               <button className="primary-btn" onClick={() => onSave(article_data)} style={{ padding: '6px 12px', fontSize: 12 }}>
+                 <Save size={12} /> Save to Library
+               </button>
+            )}
             <button className="action-btn" onClick={copy}>{copied ? '✓ Copied!' : <><Copy size={12} /> Copy</>}</button>
             <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}><X size={18} /></button>
           </div>
@@ -70,7 +75,7 @@ function ArticleModal({ article_data, onClose }) {
 }
 
 export default function ContentLibrary() {
-  const [view, setView] = useState('grid');
+  const [articles, setArticles] = useState(INITIAL_LIBRARY);
   const [search, setSearch] = useState('');
   
   // AI Generation State
@@ -79,15 +84,19 @@ export default function ContentLibrary() {
   const [keyword, setKeyword] = useState('');
   const [generating, setGenerating] = useState(false);
   const [articleResult, setArticleResult] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
 
-  const filtered = LIBRARY.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
+  const filtered = articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
 
   const handleGenerate = async () => {
     if (!topic.trim()) return alert("Please enter a topic");
     setGenerating(true);
     try {
       const data = await seoApi('generate', { title: topic, keyword: keyword });
+      // Attach the keyword used so we can save it later
+      data._originalKeyword = keyword || topic;
       setArticleResult(data);
+      setIsSaved(false);
       setShowPrompt(false);
       setTopic('');
       setKeyword('');
@@ -98,12 +107,43 @@ export default function ContentLibrary() {
     }
   };
 
+  const handleSaveArticle = (data) => {
+    const newArt = {
+      id: Date.now(),
+      title: data.title,
+      keyword: data._originalKeyword || 'AI Generated',
+      status: 'Draft',
+      words: data.wordCount || 0,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      badge: 'badge-purple',
+      content: data.content,
+      metaDescription: data.metaDescription,
+      tags: data.tags,
+      seoScore: data.seoScore,
+      readabilityScore: data.readabilityScore
+    };
+    setArticles([newArt, ...articles]);
+    setIsSaved(true);
+    alert('Article saved to library!');
+  };
+
+  const deleteArticle = (id) => {
+    if (window.confirm('Are you sure you want to delete this article?')) {
+      setArticles(articles.filter(a => a.id !== id));
+    }
+  };
+
+  const viewArticle = (art) => {
+    setArticleResult(art);
+    setIsSaved(true); // Don't show save button when viewing an already saved article
+  };
+
   return (
     <div className="page-content">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <div className="section-title">Content Library</div>
-          <div className="text-muted">{LIBRARY.length} articles total</div>
+          <div className="text-muted">{articles.length} articles total</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <input
@@ -137,8 +177,8 @@ export default function ContentLibrary() {
               </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
                 <button className="action-btn" style={{ flex: 1, justifyContent: 'center' }}><PenLine size={12} /> Edit</button>
-                <button className="action-btn-icon" title="Preview"><Eye size={13} /></button>
-                <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }}><Trash2 size={13} /></button>
+                <button className="action-btn-icon" title="Preview" onClick={() => viewArticle(art)}><Eye size={13} /></button>
+                <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(art.id)}><Trash2 size={13} /></button>
               </div>
             </div>
           );
@@ -174,6 +214,7 @@ export default function ContentLibrary() {
                 placeholder="e.g. technical seo guide"
                 value={keyword}
                 onChange={e => setKeyword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleGenerate()}
               />
             </div>
 
@@ -192,6 +233,8 @@ export default function ContentLibrary() {
         <ArticleModal
           article_data={articleResult}
           onClose={() => setArticleResult(null)}
+          onSave={handleSaveArticle}
+          isSaved={isSaved}
         />
       )}
     </div>
