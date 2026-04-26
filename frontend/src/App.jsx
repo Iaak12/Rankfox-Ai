@@ -17,6 +17,7 @@ import PageOptimizer from './pages/PageOptimizer';
 import GeoOptimizer from './pages/GeoOptimizer';
 import CompetitorXRay from './pages/CompetitorXRay';
 import AutoBacklink from './pages/AutoBacklink';
+import ContentRefresh from './pages/ContentRefresh';
 import Landing from './pages/Landing';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
@@ -33,6 +34,7 @@ const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
   '/dashboard/planner': 'Content Planner',
   '/dashboard/library': 'Content Library',
+  '/dashboard/refresh': 'Content Refresh',
   '/dashboard/insights': 'Insights',
   '/dashboard/indexing': 'Indexing',
   '/dashboard/keywords': 'Keyword Research',
@@ -177,6 +179,7 @@ function DashboardLayout() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/planner" element={<ContentPlanner />} />
             <Route path="/library" element={<ContentLibrary />} />
+            <Route path="/refresh" element={<ContentRefresh />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/indexing" element={<Indexing />} />
             <Route path="/keywords" element={<KeywordResearch />} />

@@ -510,6 +510,39 @@ Generate exactly ${num} backlink objects in the array.
   }
 };
 
+/* ─── Content Refresh ─── */
+// POST /api/seo/refresh { url }
+const contentRefresh = async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: 'URL required' });
+
+  try {
+    const data = await askGroq(`
+You are an expert SEO Content Editor.
+The user wants to refresh an outdated blog post: "${url}"
+
+Return JSON:
+{
+  "status": "success",
+  "originalWordCount": 850,
+  "newWordCount": 1450,
+  "outdatedElementsFound": [
+    "Identified outdated statistics",
+    "Missing modern context"
+  ],
+  "newKeywordsAdded": [
+    "2026 seo trends", "modern strategy"
+  ],
+  "refreshedContent": "The full, newly written, completely refreshed and expanded SEO-optimized article content here. (Generate at least 3 comprehensive paragraphs of highly professional refreshed content)."
+}
+`);
+    res.json(data);
+  } catch (err) {
+    console.error('Content Refresh error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -523,5 +556,6 @@ module.exports = {
   instantBoost,
   generateGeoPages,
   competitorXray,
-  autoBacklink
+  autoBacklink,
+  contentRefresh
 };

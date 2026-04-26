@@ -2,13 +2,14 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, BookOpen, BarChart2,
-  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search, MapPin, Target, Bot
+  Link2, AlertTriangle, Zap, FileSearch, Settings2, Lock, Globe, Search, MapPin, Target, Bot, RefreshCw
 } from 'lucide-react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard',       to: '/dashboard' },
   { icon: Calendar,        label: 'Content Planner', to: '/dashboard/planner' },
   { icon: BookOpen,        label: 'Content Library', to: '/dashboard/library' },
+  { icon: RefreshCw,       label: 'Content Refresh', to: '/dashboard/refresh' },
   { icon: BarChart2,       label: 'Insights',        to: '/dashboard/insights' },
   { icon: Globe,           label: 'Indexing',        to: '/dashboard/indexing' },
   { icon: Search,          label: 'Keyword Research',to: '/dashboard/keywords' },

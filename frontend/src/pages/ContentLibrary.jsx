@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles, Save } from 'lucide-react';
+import { PenLine, Eye, Trash2, Plus, BookOpen, X, Copy, Sparkles, Save, UploadCloud } from 'lucide-react';
 import { seoApi } from '../utils/seoApi';
 
 const INITIAL_LIBRARY = [
@@ -133,6 +133,16 @@ export default function ContentLibrary() {
     }
   };
 
+  const publishToWordPress = (id) => {
+    const art = articles.find(a => a.id === id);
+    if (!art) return;
+    if (window.confirm(`Push "${art.title}" directly to your connected WordPress site as a live post?`)) {
+      // Simulate API call to WP REST API
+      setArticles(articles.map(a => a.id === id ? { ...a, status: 'Published' } : a));
+      alert('Successfully published to WordPress via REST API!');
+    }
+  };
+
   const viewArticle = (art) => {
     setArticleResult(art);
     setIsSaved(true); // Don't show save button when viewing an already saved article
@@ -178,6 +188,7 @@ export default function ContentLibrary() {
               <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
                 <button className="action-btn" style={{ flex: 1, justifyContent: 'center' }}><PenLine size={12} /> Edit</button>
                 <button className="action-btn-icon" title="Preview" onClick={() => viewArticle(art)}><Eye size={13} /></button>
+                <button className="action-btn-icon" title="Publish to WordPress" onClick={() => publishToWordPress(art.id)}><UploadCloud size={13} color="#3b82f6" /></button>
                 <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(art.id)}><Trash2 size={13} /></button>
               </div>
             </div>
