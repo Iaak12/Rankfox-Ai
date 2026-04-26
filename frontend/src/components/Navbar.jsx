@@ -8,7 +8,7 @@ export default function Navbar() {
   return (
     <nav className="public-navbar">
       <Link to="/" className="public-logo" onClick={() => setIsOpen(false)}>
-        <img src="/fox_logo.png" alt="RankFox Logo" style={{ height: 42, width: 'auto' }} />
+        <img src="/fox_logo.png" alt="RankFox Logo" style={{ height: 42, width: 'auto', mixBlendMode: 'lighten' }} />
         <span>RankFox</span>
       </Link>
       
