@@ -281,10 +281,14 @@ function DomainManagerTab() {
 
 /* ─── Integrations Tab ─── */
 const INTEGRATIONS = [
-  { id: 'gsc',     name: 'Google Search Console', desc: 'Connect GSC for indexing & traffic insights', icon: '🔍', color: '#4285F4' },
-  { id: 'ga',      name: 'Google Analytics',      desc: 'Import GA4 traffic and engagement data',    icon: '📊', color: '#E37400' },
-  { id: 'ahrefs',  name: 'Ahrefs',                desc: 'Import backlink and keyword data',           icon: '🔗', color: '#FF6B35' },
-  { id: 'semrush', name: 'Semrush',               desc: 'Sync keyword rankings and audits',           icon: '⚡', color: '#FF642D' },
+  { id: 'gsc',       name: 'Google Search Console', desc: 'Connect GSC for indexing & traffic insights', icon: '🔍', color: '#4285F4' },
+  { id: 'ga',        name: 'Google Analytics',      desc: 'Import GA4 traffic and engagement data',    icon: '📊', color: '#E37400' },
+  { id: 'ahrefs',    name: 'Ahrefs',                desc: 'Import backlink and keyword data',           icon: '🔗', color: '#FF6B35' },
+  { id: 'semrush',   name: 'Semrush',               desc: 'Sync keyword rankings and audits',           icon: '⚡', color: '#FF642D' },
+  { id: 'wordpress', name: 'WordPress',             desc: 'Publish articles directly to WP REST API',  icon: '📝', color: '#21759b' },
+  { id: 'medium',    name: 'Medium',                desc: 'Auto-publish backlinks to Medium profile',  icon: 'Ⓜ️', color: '#000000' },
+  { id: 'blogger',   name: 'Blogger',               desc: 'Auto-publish backlinks to Blogger',         icon: '🅱️', color: '#f57c00' },
+  { id: 'tumblr',    name: 'Tumblr',                desc: 'Auto-publish backlinks to Tumblr blogs',    icon: '🇹', color: '#35465c' },
 ];
 
 function IntegrationsTab() {
@@ -293,6 +297,10 @@ function IntegrationsTab() {
     ga: localStorage.getItem('ga_connected') === 'true',
     ahrefs: localStorage.getItem('ahrefs_connected') === 'true',
     semrush: localStorage.getItem('semrush_connected') === 'true',
+    wordpress: localStorage.getItem('wordpress_connected') === 'true',
+    medium: localStorage.getItem('medium_connected') === 'true',
+    blogger: localStorage.getItem('blogger_connected') === 'true',
+    tumblr: localStorage.getItem('tumblr_connected') === 'true',
   });
   
   const [connecting, setConnecting] = useState({});
