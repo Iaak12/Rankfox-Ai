@@ -26,6 +26,7 @@ export default function Navbar() {
           <Link to="/pricing" className="public-nav-link" onClick={() => setIsOpen(false)}>Pricing</Link>
           <Link to="/about" className="public-nav-link" onClick={() => setIsOpen(false)}>About</Link>
           <Link to="/contact" className="public-nav-link" onClick={() => setIsOpen(false)}>Contact</Link>
+          <Link to="/blog" className="public-nav-link" onClick={() => setIsOpen(false)}>Blog</Link>
         </div>
         <div className="public-nav-actions">
           <Link to="/dashboard" className="public-btn-primary" onClick={() => setIsOpen(false)}>Get a Demo</Link>

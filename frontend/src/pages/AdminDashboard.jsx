@@ -29,7 +29,9 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('hero');
   const [pageData, setPageData] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [blogs, setBlogs] = useState([]);
   const [newFaq, setNewFaq] = useState({ question: '', answer: '' });
+  const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
   
   const navigate = useNavigate();
 
@@ -44,16 +46,18 @@ export default function AdminDashboard() {
       try {
         const headers = { 'Authorization': `Bearer ${token}` };
         const apiBase = import.meta.env.VITE_API_URL;
-        const [usersRes, contactsRes, faqsRes] = await Promise.all([
+        const [usersRes, contactsRes, faqsRes, blogsRes] = await Promise.all([
           fetch(`${apiBase}/admin/users`, { headers }),
           fetch(`${apiBase}/admin/contacts`, { headers }),
-          fetch(`${apiBase}/faqs`)
+          fetch(`${apiBase}/faqs`),
+          fetch(`${apiBase}/blogs/admin/all`, { headers })
         ]);
 
         if (!usersRes.ok || !contactsRes.ok) throw new Error('Auth failed');
         setUsers(await usersRes.json());
         setContacts(await contactsRes.json());
         setFaqs(await faqsRes.json());
+        setBlogs(await blogsRes.json());
         setLoading(false);
       } catch (err) {
         localStorage.removeItem('adminToken');
@@ -160,6 +164,69 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleGenerateAiBlog = async () => {
+    const topic = window.prompt('Enter blog topic (e.g., How AI is changing local SEO):');
+    if (!topic) return;
+
+    const token = localStorage.getItem('adminToken');
+    setIsGeneratingBlog(true);
+    try {
+      // 1. Generate Blog Content using Rexo/Echo
+      const genRes = await fetch(`${import.meta.env.VITE_API_URL}/seo/generate-blog`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ topic })
+      });
+      
+      const aiData = await genRes.json();
+      if (!genRes.ok) throw new Error(aiData.message);
+
+      // 2. Save to DB
+      const saveRes = await fetch(`${import.meta.env.VITE_API_URL}/blogs`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: aiData.title,
+          slug: aiData.slug,
+          content: aiData.content,
+          excerpt: aiData.excerpt,
+          isAiGenerated: true,
+          status: 'Published'
+        })
+      });
+
+      if (saveRes.ok) {
+        const saved = await saveRes.json();
+        setBlogs([saved, ...blogs]);
+        alert('AI Blog Generated and Published!');
+      }
+    } catch (err) {
+      alert('Generation failed: ' + err.message);
+    } finally {
+      setIsGeneratingBlog(false);
+    }
+  };
+
+  const handleDeleteBlog = async (id) => {
+    if (!window.confirm('Delete this blog post?')) return;
+    const token = localStorage.getItem('adminToken');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogs/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) setBlogs(blogs.filter(b => b._id !== id));
+    } catch (err) {
+      alert('Delete failed');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     navigate('/adminlogin');
@@ -197,7 +264,9 @@ export default function AdminDashboard() {
             <Users size={20} /> <span>Registered Users</span>
           </button>
           <div className="admin-nav-item"><MapPin size={20} /> <span>Locations (SEO)</span></div>
-          <div className="admin-nav-item"><FileText size={20} /> <span>Blogs</span></div>
+          <button onClick={() => setActiveView('blogs')} className={`admin-nav-item ${activeView === 'blogs' ? 'active' : ''}`} style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
+            <FileText size={20} /> <span>Blogs</span>
+          </button>
           <button onClick={() => setActiveView('faqs')} className={`admin-nav-item ${activeView === 'faqs' ? 'active' : ''}`} style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
             <HelpCircle size={20} /> <span>FAQs</span>
           </button>
@@ -393,6 +462,74 @@ export default function AdminDashboard() {
                   <div style={{ textAlign: 'center', color: '#64748b', marginTop: 40 }}>Select a section to begin editing.</div>
                 )}
               </div>
+            </div>
+          ) : activeView === 'blogs' ? (
+            <div className="admin-table-card" style={{ padding: '32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+                <div>
+                  <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e293b', margin: 0 }}>Manage Blogs</h3>
+                  <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>Create, edit, and delete your blog posts</p>
+                </div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button 
+                    onClick={handleGenerateAiBlog} 
+                    className="save-btn" 
+                    style={{ background: '#a855f7', display: 'flex', alignItems: 'center', gap: 8 }}
+                    disabled={isGeneratingBlog}
+                  >
+                    <Zap size={16} /> {isGeneratingBlog ? 'Echo is writing...' : 'Auto-Generate AI Blog'}
+                  </button>
+                  <button className="save-btn" style={{ background: '#3b82f6' }}>+ Create New Blog</button>
+                </div>
+              </div>
+
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title & Slug</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {blogs.map(b => (
+                    <tr key={b._id}>
+                      <td style={{ padding: '16px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <FileText size={20} color="#64748b" />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: '#1e293b' }}>{b.title}</div>
+                            <div style={{ fontSize: 12, color: '#94a3b8' }}>/{b.slug}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ 
+                          padding: '4px 10px', 
+                          borderRadius: 20, 
+                          fontSize: 11, 
+                          fontWeight: 700,
+                          background: b.status === 'Published' ? '#dcfce7' : '#f1f5f9',
+                          color: b.status === 'Published' ? '#16a34a' : '#64748b'
+                        }}>
+                          {b.status.toUpperCase()}
+                        </span>
+                        {b.isAiGenerated && <div style={{ fontSize: 10, color: '#a855f7', marginTop: 4, fontWeight: 600 }}>AI GENERATED</div>}
+                      </td>
+                      <td style={{ color: '#64748b', fontSize: 13 }}>{new Date(b.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <button style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}><ChevronRight size={18} /></button>
+                          <button onClick={() => handleDeleteBlog(b._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : activeView === 'users' ? (
             <div className="admin-table-card" style={{ padding: '32px' }}>

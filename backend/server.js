@@ -13,6 +13,7 @@ const contentRoutes = require('./routes/contentRoutes');
 const faqRoutes = require('./routes/faqRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 const integrationRoutes = require('./routes/integrationRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 
 // Connect to database
 connectDB();
@@ -62,6 +63,7 @@ app.use('/api/content', contentRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/integrations', integrationRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // Root route
 app.get('/', (req, res) => {

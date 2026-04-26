@@ -579,6 +579,55 @@ Return JSON:
   }
 };
 
+/* ─── Blog Post Generator (For Super Admin / Automation) ─── */
+const generateBlog = async (req, res) => {
+  const { topic } = req.body;
+  if (!topic) return res.status(400).json({ message: 'Topic is required' });
+
+  try {
+    // Phase 1: Rexo (The SEO Strategist)
+    const architect = await askGroq(`
+      You are Rexo, the Lead SEO Strategist.
+      Create an advanced SEO blueprint for a long-form blog post about: "${topic}".
+      Identify 3 secondary keywords, a catchy H1 title, and a logical H2 outline.
+      
+      Response Format:
+      {
+        "h1": "SEO Optimized Title",
+        "keywords": ["key1", "key2", "key3"],
+        "outline": ["Intro", "Section 1", "Section 2", "Conclusion"],
+        "slug": "seo-optimized-slug"
+      }
+    `);
+
+    // Phase 2: Echo (The Content Artisan)
+    const writing = await askGroq(`
+      You are Echo, the Content Artisan. 
+      Based on Rexo's plan:
+      Title: ${architect.h1}
+      Keywords: ${architect.keywords.join(', ')}
+      Outline: ${architect.outline.join(' -> ')}
+      
+      Write a comprehensive, human-like, 1500+ word blog post.
+      Use Markdown formatting (H2, H3, Bold, Lists).
+      Provide a 160-character excerpt at the end.
+
+      Response Format:
+      {
+        "title": "${architect.h1}",
+        "content": "Full markdown content here...",
+        "excerpt": "Short engaging excerpt here...",
+        "slug": "${architect.slug}"
+      }
+    `, 'You are a high-perplexity content writer. Avoid robotic cliches.');
+
+    res.json(writing);
+  } catch (err) {
+    console.error('Blog generation error:', err.message);
+    res.status(500).json({ message: 'AI error: ' + err.message });
+  }
+};
+
 module.exports = {
   keywordResearch,
   generateArticle,
@@ -593,5 +642,6 @@ module.exports = {
   generateGeoPages,
   competitorXray,
   autoBacklink,
-  contentRefresh
+  contentRefresh,
+  generateBlog
 };

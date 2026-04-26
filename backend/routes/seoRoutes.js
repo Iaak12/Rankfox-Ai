@@ -15,7 +15,8 @@ const {
   generateGeoPages,
   competitorXray,
   autoBacklink,
-  contentRefresh
+  contentRefresh,
+  generateBlog
 } = require('../controllers/seoController');
 
 router.post('/keywords',   protect, keywordResearch);
@@ -32,5 +33,6 @@ router.post('/geo',        protect, generateGeoPages);
 router.post('/competitor', protect, competitorXray);
 router.post('/autobacklink', protect, autoBacklink);
 router.post('/refresh',    protect, contentRefresh);
+router.post('/generate-blog', protect, generateBlog);
 
 module.exports = router;

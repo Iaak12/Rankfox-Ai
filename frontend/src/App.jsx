@@ -25,6 +25,8 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Products from './pages/Products';
 import Contact from './pages/Contact';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Chatbot from './components/Chatbot';
@@ -210,6 +212,8 @@ export default function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
         
         {/* Super Admin Routes */}
         <Route path="/adminlogin" element={<AdminLogin />} />
