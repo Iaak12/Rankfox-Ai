@@ -7,6 +7,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const faqRoutes = require('./routes/faqRoutes');
+const seoRoutes = require('./routes/seoRoutes');
 
 // Load env vars
 dotenv.config();
@@ -48,6 +49,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/faqs', faqRoutes);
+app.use('/api/seo', seoRoutes);
 
 // Root route
 app.get('/', (req, res) => {

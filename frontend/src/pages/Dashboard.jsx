@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X, Sparkles, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { seoApi } from '../utils/seoApi';
 
 /* GSC Google icon (coloured) */
 function GSCIcon() {
@@ -24,9 +26,9 @@ const ARTICLES = [
 ];
 
 const DIFF_COLORS = {
-  0: { bg: '#dcfce7', color: '#16a34a' },
-  low: { bg: '#dbeafe', color: '#2563eb' },
-  mid: { bg: '#ffedd5', color: '#ea580c' },
+  0:    { bg: '#dcfce7', color: '#16a34a' },
+  low:  { bg: '#dbeafe', color: '#2563eb' },
+  mid:  { bg: '#ffedd5', color: '#ea580c' },
   high: { bg: '#fee2e2', color: '#dc2626' },
 };
 
@@ -37,16 +39,90 @@ function getDiffStyle(d) {
   return DIFF_COLORS.high;
 }
 
+/* Article Generation Modal */
+function ArticleModal({ article, article_data, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(article_data?.content || '');
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 760, maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.2)' }}>
+        {/* Header */}
+        <div style={{ padding: '18px 24px', borderBottom: '1px solid #f0f0f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{article_data?.title || article.title}</div>
+            <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>
+              {article_data?.wordCount} words · SEO Score: {article_data?.seoScore} · Readability: {article_data?.readabilityScore}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="action-btn" onClick={copy}>{copied ? '✓ Copied!' : <><Copy size={12} /> Copy</>}</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}><X size={18} /></button>
+          </div>
+        </div>
+
+        {/* Meta */}
+        {article_data?.metaDescription && (
+          <div style={{ padding: '10px 24px', background: '#f8f8fc', borderBottom: '1px solid #f0f0f5' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af' }}>META DESCRIPTION · </span>
+            <span style={{ fontSize: 12, color: '#374151' }}>{article_data.metaDescription}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px' }}>
+          <pre style={{ fontFamily: 'Inter', fontSize: 13, lineHeight: 1.8, color: '#1a1a2e', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {article_data?.content}
+          </pre>
+        </div>
+
+        {/* Tags */}
+        {article_data?.tags?.length > 0 && (
+          <div style={{ padding: '12px 24px', borderTop: '1px solid #f0f0f5', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {article_data.tags.map(t => (
+              <span key={t} className="keyword-badge badge-purple">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [filter, setFilter] = useState('7 Days');
+  const [kwInput, setKwInput] = useState('');
   const filters = ['7 Days', '28 Days', '180 Days'];
   const [gscDismissed, setGscDismissed] = useState(
     () => sessionStorage.getItem('gsc_banner_dismissed') === 'true'
   );
+  const [generating, setGenerating] = useState({});
+  const [modal, setModal] = useState(null); // { article, data }
+  const navigate = useNavigate();
 
   const dismissGsc = () => {
     sessionStorage.setItem('gsc_banner_dismissed', 'true');
     setGscDismissed(true);
+  };
+
+  const handleCreate = async (art) => {
+    setGenerating(g => ({ ...g, [art.id]: true }));
+    try {
+      const data = await seoApi('generate', { title: art.title, keyword: art.keyword });
+      setModal({ article: art, data });
+    } catch (e) {
+      alert('AI Error: ' + e.message);
+    } finally {
+      setGenerating(g => ({ ...g, [art.id]: false }));
+    }
+  };
+
+  const handleKwSearch = (e) => {
+    if (e.key === 'Enter' && kwInput.trim()) {
+      navigate(`/dashboard/keywords?q=${encodeURIComponent(kwInput.trim())}`);
+    }
   };
 
   return (
@@ -101,7 +177,7 @@ export default function Dashboard() {
           </div>
           <div className="card-footer" style={{ marginTop: 'auto' }}>
             <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
-            <a className="action-link" href="#">More Insights <ArrowRight size={13} /></a>
+            <a className="action-link" href="/dashboard/insights">More Insights <ArrowRight size={13} /></a>
           </div>
         </div>
 
@@ -112,7 +188,7 @@ export default function Dashboard() {
           <div className="index-label">Total Pages Indexed</div>
           <div className="card-footer" style={{ marginTop: 'auto' }}>
             <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
-            <a className="action-link" href="#"><Globe size={13} /> Index Pages <ArrowRight size={13} /></a>
+            <a className="action-link" href="/dashboard/indexing"><Globe size={13} /> Index Pages <ArrowRight size={13} /></a>
           </div>
         </div>
 
@@ -120,8 +196,14 @@ export default function Dashboard() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="card-title">Keyword Search</div>
           <div className="keyword-input-wrap">
-            <input className="keyword-input" placeholder="Enter Keyword" />
-            <span className="keyword-search-icon">🔍</span>
+            <input
+              className="keyword-input"
+              placeholder="Enter Keyword & press Enter"
+              value={kwInput}
+              onChange={e => setKwInput(e.target.value)}
+              onKeyDown={handleKwSearch}
+            />
+            <span className="keyword-search-icon" onClick={() => kwInput.trim() && navigate(`/dashboard/keywords?q=${encodeURIComponent(kwInput.trim())}`)} style={{ cursor: 'pointer' }}>🔍</span>
           </div>
           <div className="card-footer" style={{ marginTop: 'auto' }}>
             <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
@@ -140,6 +222,7 @@ export default function Dashboard() {
         </div>
         {ARTICLES.map(art => {
           const ds = getDiffStyle(art.difficulty);
+          const isGen = generating[art.id];
           return (
             <div className="table-row" key={art.id}>
               <div className="article-title-cell">
@@ -153,13 +236,35 @@ export default function Dashboard() {
               </div>
               <div style={{ fontSize: 13, color: '#6b7280' }}>{art.volume.toLocaleString()}</div>
               <div className="table-actions">
-                <button className="action-btn"><PenLine size={12} /> Create</button>
-                <button className="action-btn-icon" title="Copy"><Copy size={13} /></button>
+                <button
+                  className="action-btn"
+                  onClick={() => handleCreate(art)}
+                  disabled={isGen}
+                  style={{ minWidth: 90, opacity: isGen ? 0.7 : 1 }}
+                >
+                  {isGen
+                    ? <><span className="spinner" style={{ width: 11, height: 11 }} /> Writing…</>
+                    : <><Sparkles size={12} /> Create</>
+                  }
+                </button>
+                <button className="action-btn-icon" title="Copy" onClick={() => navigator.clipboard.writeText(art.title)}>
+                  <Copy size={13} />
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Article Modal */}
+      {modal && (
+        <ArticleModal
+          article={modal.article}
+          article_data={modal.data}
+          onClose={() => setModal(null)}
+        />
+      )}
     </div>
   );
 }
+

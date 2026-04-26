@@ -1045,3 +1045,40 @@ h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
 /* Indexing card: make it flex column so footer stays at bottom */
 .card.flex-col { display: flex; flex-direction: column; }
 .card.flex-col .card-footer { margin-top: auto; }
+
+/* ── SEO Tool Stat Cards ── */
+.issues-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.issue-stat-card {
+  background: #fff;
+  border: 1px solid #e8e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  text-align: center;
+}
+.issue-stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.issue-stat-label {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ── Audit issue item (shared) ── */
+.audit-issue-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f5;
+  transition: background 0.1s;
+}
+.audit-issue-item:last-child { border-bottom: none; }
+.audit-issue-item:hover { background: #fafafd; }
