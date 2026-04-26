@@ -13,21 +13,27 @@ function getGroq() {
 }
 
 /* ─── Helper: call Groq and parse JSON back ─── */
-async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond with valid JSON only.') {
+async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond in JSON format.') {
   const groqClient = getGroq();
   const chat = await groqClient.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
+    response_format: { type: "json_object" },
     messages: [
       { role: 'system', content: systemMsg },
       { role: 'user', content: prompt }
     ],
     temperature: 0.4,
-    max_tokens: 2048,
+    max_tokens: 3000,
   });
   const raw = chat.choices[0]?.message?.content || '{}';
-  // Strip markdown code fences if present
-  const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('JSON Parse error on AI response:', err.message, '\nRaw Output:', raw);
+    // Attempt fallback cleanup just in case
+    const cleaned = raw.replace(/[\u0000-\u001F]+/g, ' '); 
+    return JSON.parse(cleaned);
+  }
 }
 
 /* ─── Keyword Research ─── */
