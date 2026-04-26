@@ -9,8 +9,10 @@ export default function Navbar() {
     <nav className="public-navbar">
       <Link to="/" className="public-logo" onClick={() => setIsOpen(false)}>
         <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M12 2L3 9l2 13 7-3 7 3 2-13-9-7z" />
-          <path d="M9 11l3 3 3-3" />
+          <path d="M15.5 2L12 7 8.5 2 2 13h20L15.5 2z" />
+          <path d="M9 11c0 1 1 2 2 2s2-1 2-2" />
+          <path d="M15 11c0 1-1 2-2 2s-2-1-2-2" />
+          <path d="M12 15v2" />
         </svg>
         <span>RankFox</span>
       </Link>
