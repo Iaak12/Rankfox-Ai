@@ -26,9 +26,57 @@ export default function Pricing() {
   };
 
   const plans = content?.plans || [
-    { name: 'Basic', price: '$299/month', target: 'FOR SMALL BUSINESSES & EARLY TEAMS' },
-    { name: 'Standard', price: '$499/month', target: 'FOR GROWING D2C, SAAS, AND SERVICE BRANDS' },
-    { name: 'Enterprise', price: 'CUSTOM', target: 'FOR LARGE BRANDS, MULTI-LOCATION TEAMS' }
+    { 
+      name: 'Basic', 
+      price: '$299/month', 
+      target: 'FOR SMALL BUSINESSES & EARLY TEAMS',
+      features: [
+        '1 Service Included (SEO or GEO or Local SEO)',
+        'Up to 15 Target Keywords / Prompts',
+        '4 New Pages or Blogs / mo',
+        '8 Content Improvements / Refreshes / mo',
+        '1 Competitor Audit / mo',
+        'Technical Site Fixes (up to 5 issues / mo)',
+        'Monthly Performance Report',
+        'Whatsapp / Email Support',
+        'Dedicated Kamp',
+        'Basic Support'
+      ]
+    },
+    { 
+      name: 'Standard', 
+      price: '$499/month', 
+      target: 'FOR GROWING D2C, SAAS, AND SERVICE BRANDS',
+      features: [
+        'Any 2 Services (SEO + GEO / SEO + Local)',
+        'Up to 40 Target Keywords / Prompts',
+        '8 New Pages or Blogs / mo',
+        '20 Content Improvements / Refreshes / mo',
+        'Competitor Insights Dashboard',
+        'Fix All Critical Technical SEO Issues',
+        'Schema Setup & Optimization',
+        'Local SEO Presence Boost (Maps, Citations, Reviews)',
+        'Fortnightly Review Calls',
+        'Priority Support Enterprise'
+      ]
+    },
+    { 
+      name: 'Enterprise', 
+      price: 'CUSTOM', 
+      target: 'FOR LARGE BRANDS, MULTI-LOCATION TEAMS, AGENCIES',
+      features: [
+        'All 3 Services Included (SEO + GEO + Local SEO)',
+        'Unlimited Keywords / Prompts Tracking',
+        'Custom Content Volume Based on Goals',
+        'Full Technical SEO Overhaul',
+        'GEO Strategy Across All Major AI Search Platforms',
+        'Local SEO for Multiple Locations',
+        'Dedicated Strategist + Account Manager',
+        'Custom Dashboards & Integrations',
+        'Weekly Strategy Calls',
+        'Dedicated Manager'
+      ]
+    }
   ];
 
   return (
@@ -37,7 +85,7 @@ export default function Pricing() {
       <div className="pricing-glow"></div>
       
       <main style={{ flex: 1 }}>
-        <section className="pricing-container">
+        <section className="pricing-container" style={{ paddingBottom: 100 }}>
           <div className="page-badge">PRICING</div>
           <h1 className="pricing-title">{header.title}</h1>
           <p className="pricing-subtitle">{header.subtitle}</p>
@@ -48,17 +96,28 @@ export default function Pricing() {
             <span className="toggle-badge">2 MONTHS FREE</span>
           </div>
           
-          <div className="pricing-cards">
+          <div className="pricing-cards" style={{ alignItems: 'stretch' }}>
             {plans.map((p, i) => (
-              <div key={i} className={`price-card ${p.name.toLowerCase()}`}>
-                <div className="plan-name">{p.name}</div>
-                <div className="plan-price">{p.price}</div>
-                <div className="plan-desc">
+              <div key={i} className={`price-card ${p.name.toLowerCase()}`} style={{ height: 'auto', minHeight: '800px', display: 'flex', flexDirection: 'column' }}>
+                <div className="plan-name" style={{ fontSize: 32, marginBottom: 8 }}>{p.name}</div>
+                <div className="plan-price" style={{ fontSize: 24, color: '#fff', marginBottom: 16 }}>{p.price}</div>
+                <div className="plan-desc" style={{ fontSize: 14, color: '#94a3b8', marginBottom: 32 }}>
                   For growing companies who want to monitor visibility and create AEO optimized content
                 </div>
-                <div className="plan-target">{p.target}</div>
-                <div style={{ flex: 1 }}></div>
-                <Link to="/dashboard" className="price-btn">{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
+                <div className="plan-target" style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1, color: '#cbd5e1', marginBottom: 24 }}>{p.target}</div>
+                
+                <div className="plan-features" style={{ marginBottom: 40, flex: 1 }}>
+                  {p.features?.map((f, fi) => (
+                    <div key={fi} style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'flex-start' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#16a34a', marginTop: 2, flexShrink: 0 }}>
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.4 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link to="/dashboard" className="price-btn" style={{ marginTop: 'auto' }}>{p.price === 'CUSTOM' ? 'Contact Us' : 'Get Started'}</Link>
               </div>
             ))}
           </div>
