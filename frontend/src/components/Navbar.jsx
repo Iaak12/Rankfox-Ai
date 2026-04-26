@@ -8,10 +8,10 @@ export default function Navbar() {
   return (
     <nav className="public-navbar">
       <Link to="/" className="public-logo" onClick={() => setIsOpen(false)}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="#3b82f6" style={{ filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))' }}>
-          <path d="M12 2L4.5 9 3 22l9-3 9 3-1.5-13L12 2z"/>
-          <circle cx="9" cy="12" r="1" fill="#fff" opacity="0.8"/>
-          <circle cx="15" cy="12" r="1" fill="#fff" opacity="0.8"/>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M15.5 2L12 7 8.5 2 2 13h20L15.5 2z" />
+          <path d="M12 18v-3" />
+          <path d="M10 11l.5.5M14 11l-.5.5" />
         </svg>
         <span>RankFox</span>
       </Link>
