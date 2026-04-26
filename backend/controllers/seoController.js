@@ -16,7 +16,7 @@ function getGroq() {
 async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Always respond with valid JSON only.') {
   const groqClient = getGroq();
   const chat = await groqClient.chat.completions.create({
-    model: 'llama3-70b-8192',
+    model: 'mixtral-8x7b-32768',
     messages: [
       { role: 'system', content: systemMsg },
       { role: 'user', content: prompt }
