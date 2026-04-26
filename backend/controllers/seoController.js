@@ -31,9 +31,9 @@ async function askGroq(prompt, systemMsg = 'You are an expert SEO analyst. Alway
     return JSON.parse(raw);
   } catch (err) {
     // If rate limited or 70b fails, fallback to 8b automatically
-    if ((err.status === 429 || err.message.includes('429')) && model !== 'llama3-8b-8192') {
+    if ((err.status === 429 || err.message.includes('429')) && model !== 'llama-3.1-8b-instant') {
       console.warn('Rate limit hit on 70b, falling back to 8b...');
-      return askGroq(prompt, systemMsg, 'llama3-8b-8192');
+      return askGroq(prompt, systemMsg, 'llama-3.1-8b-instant');
     }
     throw err;
   }
@@ -102,7 +102,7 @@ Generate a structured JSON plan:
   "headings": ["H2: ...", "H3: ..."],
   "contentGapsToFill": ["gap 1", "gap 2"]
 }
-`, undefined, 'llama3-8b-8192');
+`, undefined, 'llama-3.1-8b-instant');
 
     // Agent 2: The Writer & Editor
     const finalArticle = await askGroq(`
