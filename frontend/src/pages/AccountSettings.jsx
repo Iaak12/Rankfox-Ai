@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Plus, Check, Eye, EyeOff, ExternalLink, Globe, Zap, Link2 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -291,36 +291,83 @@ const INTEGRATIONS = [
   { id: 'tumblr',    name: 'Tumblr',                desc: 'Auto-publish backlinks to Tumblr blogs',    icon: '🇹', color: '#35465c' },
 ];
 
+import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL || 'https://rankfox-ai.onrender.com';
+
 function IntegrationsTab() {
   const [connected, setConnected] = useState({
-    gsc: localStorage.getItem('gsc_connected') === 'true',
-    ga: localStorage.getItem('ga_connected') === 'true',
-    ahrefs: localStorage.getItem('ahrefs_connected') === 'true',
-    semrush: localStorage.getItem('semrush_connected') === 'true',
-    wordpress: localStorage.getItem('wordpress_connected') === 'true',
-    medium: localStorage.getItem('medium_connected') === 'true',
-    blogger: localStorage.getItem('blogger_connected') === 'true',
-    tumblr: localStorage.getItem('tumblr_connected') === 'true',
+    gsc: false, ga: false, ahrefs: false, semrush: false,
+    wordpress: false, medium: false, blogger: false, tumblr: false
   });
   
   const [connecting, setConnecting] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const toggle = (id) => {
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        if (!token) return;
+        const { data } = await axios.get(`${API_URL}/api/integrations/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setConnected(prev => ({ ...prev, ...data }));
+      } catch (e) {
+        console.error('Failed to fetch integrations', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStatus();
+  }, []);
+
+  const toggle = async (id) => {
+    const token = JSON.parse(localStorage.getItem('user'))?.token;
+    if (!token) return alert('Please login first to connect APIs.');
+
     if (connected[id]) {
-      // Disconnect immediately
-      setConnected(c => ({ ...c, [id]: false }));
-      localStorage.removeItem(`${id}_connected`);
-      if (id === 'gsc') sessionStorage.removeItem('gsc_banner_dismissed');
-    } else {
-      // Simulate OAuth connection flow
       setConnecting(c => ({ ...c, [id]: true }));
-      setTimeout(() => {
+      try {
+        await axios.post(`${API_URL}/api/integrations/disconnect/${id}`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setConnected(c => ({ ...c, [id]: false }));
+      } catch (e) {
+        alert('Failed to disconnect: ' + (e.response?.data?.message || e.message));
+      } finally {
         setConnecting(c => ({ ...c, [id]: false }));
+      }
+    } else {
+      let payload = { token: 'mock_token_123' };
+      if (id === 'wordpress') {
+        const url = window.prompt('Enter your WordPress Site URL (e.g. https://site.com):');
+        if (!url) return;
+        const username = window.prompt('Enter your WordPress Admin Username:');
+        if (!username) return;
+        const appPassword = window.prompt('Enter your WordPress Application Password:');
+        if (!appPassword) return;
+        payload = { url, username, appPassword };
+      } else {
+        const apiKey = window.prompt(`Please enter your ${id.toUpperCase()} API Key / OAuth Token to authorize RankFox:`, '');
+        if (!apiKey) return;
+        payload.token = apiKey;
+      }
+
+      setConnecting(c => ({ ...c, [id]: true }));
+      try {
+        await axios.post(`${API_URL}/api/integrations/connect/${id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setConnected(c => ({ ...c, [id]: true }));
-        localStorage.setItem(`${id}_connected`, 'true');
-      }, 2000);
+      } catch (e) {
+        alert('Failed to connect: ' + (e.response?.data?.message || e.message));
+      } finally {
+        setConnecting(c => ({ ...c, [id]: false }));
+      }
     }
   };
+
+  if (loading) return <div className="acc-section" style={{ padding: 40, textAlign: 'center' }}><span className="spinner" style={{ borderColor: '#e5e7eb', borderTopColor: '#3b82f6', width: 24, height: 24 }} /></div>;
 
   return (
     <div className="acc-section">

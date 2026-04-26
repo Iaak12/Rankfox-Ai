@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema({
   },
   otp: String,
   otpExpires: Date,
+  integrations: {
+    medium: { connected: { type: Boolean, default: false }, token: String },
+    blogger: { connected: { type: Boolean, default: false }, token: String },
+    tumblr: { connected: { type: Boolean, default: false }, token: String },
+    wordpress: { connected: { type: Boolean, default: false }, url: String, username: String, appPassword: String }
+  }
 }, {
   timestamps: true,
 });
@@ -52,6 +58,7 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-const User = mongoose.model('User', userSchema);
+// Handle model caching in dev
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 module.exports = User;
