@@ -14,7 +14,7 @@ export default function AutoBacklink() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const types = ['Web 2.0 Auto-Publisher', 'Directory Submissions', 'Profile Backlinks', 'Blog Post Auto-Publisher', 'Article Submission'];
+  const types = ['Web 2.0 Auto-Publisher', 'Directory Submissions', 'Profile Backlinks', 'Blog Post Auto-Publisher', 'Article Submission', 'Guest Post Automation'];
 
   const addLog = (msg) => {
     setConsoleLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
@@ -164,23 +164,42 @@ export default function AutoBacklink() {
 
              {result && (
                <div className="table-card" style={{ border: 'none', padding: 0 }}>
-                 <div className="table-header" style={{ gridTemplateColumns: '1fr 2fr 60px 80px', padding: '10px 14px' }}>
-                   <span>Platform</span><span>Published URL</span><span>DA</span><span>Status</span>
-                 </div>
-                 <div style={{ maxHeight: 240, overflowY: 'auto' }}>
-                   {result.backlinks?.map((bl, i) => (
-                     <div key={i} className="table-row" style={{ gridTemplateColumns: '1fr 2fr 60px 80px', padding: '12px 14px', borderBottom: '1px solid #f0f0f5' }}>
-                       <span style={{ fontWeight: 600, color: '#374151', fontSize: 13 }}>{bl.platform}</span>
-                       <a href={bl.publishedUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#3b82f6', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                         {bl.publishedUrl} <ExternalLink size={10} />
-                       </a>
-                       <span style={{ fontSize: 13, fontWeight: 700, color: '#7c3aed' }}>{bl.domainAuthority}</span>
-                       <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: '#dcfce7', padding: '2px 6px', borderRadius: 4, display: 'inline-block', textAlign: 'center' }}>
-                         {bl.status}
-                       </span>
-                     </div>
-                   ))}
-                 </div>
+                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                   <thead>
+                     <tr style={{ textAlign: 'left', fontSize: 11, color: '#9ca3af', textTransform: 'uppercase' }}>
+                       <th style={{ paddingBottom: 10 }}>Platform</th>
+                       <th style={{ paddingBottom: 10 }}>URL</th>
+                       <th style={{ paddingBottom: 10, textAlign: 'center' }}>DA</th>
+                       <th style={{ paddingBottom: 10, textAlign: 'right' }}>Status</th>
+                     </tr>
+                   </thead>
+                   <tbody style={{ maxHeight: 240, overflowY: 'auto' }}>
+                     {result.backlinks?.map((link, index) => (
+                       <tr key={index} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                         <td style={{ padding: '12px 0', fontSize: 13, fontWeight: 500, color: '#1f2937' }}>{link.platform}</td>
+                         <td style={{ padding: '12px 0', fontSize: 13 }}>
+                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                             <a href={link.publishedUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>
+                               {link.publishedUrl.length > 40 ? link.publishedUrl.substring(0, 40) + '...' : link.publishedUrl}
+                             </a>
+                             {link.contextual && (
+                               <button 
+                                 onClick={() => alert(`Contextual Content Used:\n\n${link.content.substring(0, 500)}...`)}
+                                 style={{ padding: '2px 6px', fontSize: 10, background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4, cursor: 'pointer' }}
+                               >
+                                 📄 Content
+                               </button>
+                             )}
+                           </div>
+                         </td>
+                         <td style={{ padding: '12px 0', fontSize: 13, color: '#4b5563', textAlign: 'center' }}>{link.domainAuthority}</td>
+                         <td style={{ padding: '12px 0', textAlign: 'right' }}>
+                           <span style={{ fontSize: 11, background: '#dcfce7', color: '#166534', padding: '4px 8px', borderRadius: 99, fontWeight: 600 }}>{link.status}</span>
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
                </div>
              )}
 
