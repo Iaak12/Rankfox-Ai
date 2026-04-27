@@ -156,7 +156,9 @@ export default function ContentLibrary() {
       setIsSaved(true);
       alert('Article saved to library persistently!');
     } catch (e) {
-      alert('Failed to save article: ' + e.message);
+      console.error('Save error:', e.response?.data || e);
+      const errorMsg = e.response?.data?.error || e.response?.data?.message || e.message;
+      alert('Failed to save article: ' + errorMsg);
     }
   };
 
