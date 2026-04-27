@@ -607,17 +607,12 @@ const autoBacklink = async (req, res) => {
       { name: 'BuiltWith', template: 'https://builtwith.com/{domain}', da: 90 },
       { name: 'SimilarWeb', template: 'https://www.similarweb.com/website/{domain}/', da: 92 },
       { name: 'StatShow', template: 'https://www.statshow.com/www/{domain}', da: 65 },
-      { name: 'CuteStat', template: 'https://{domain}.cutestat.com/', da: 74 },
       { name: 'SitePrice', template: 'https://www.siteprice.org/website-worth/{domain}', da: 68 },
       { name: 'WorthOfWeb', template: 'https://www.worthofweb.com/website-value/{domain}/', da: 70 },
       { name: 'Hypestat', template: 'https://hypestat.com/info/{domain}', da: 76 },
       { name: 'SiteWorthTraffic', template: 'https://www.siteworthtraffic.com/report/{domain}', da: 58 },
-      { name: 'W3Snoop', template: 'https://www.w3snoop.com/site/{domain}', da: 61 },
-      { name: 'Webuka', template: 'http://www.webuka.com/info/{domain}', da: 50 },
       { name: 'StatsCrop', template: 'https://www.statscrop.com/www/{domain}', da: 69 },
-      { name: 'WebStatsDomain', template: 'https://www.webstatsdomain.org/domains/{domain}', da: 60 },
       { name: 'CheckWebsitePrice', template: 'https://www.checkwebsiteprice.com/domain/{domain}', da: 55 },
-      { name: 'SiteIndices', template: 'https://www.siteindices.com/stats/{domain}', da: 45 },
       { name: 'DomainTools', template: 'https://whois.domaintools.com/{domain}', da: 89 }
     ];
 
