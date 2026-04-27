@@ -37,6 +37,16 @@ export default function Insights() {
 
   return (
     <div className="page-content">
+      {/* Mock Data Banner */}
+      {!data.isRealData && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '12px 16px', borderRadius: 8, marginBottom: 20, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 16 }}>⚠️</span>
+          <div>
+            <strong>Simulated Data Active:</strong> The insights shown below are AI-generated mock data. To view your real website traffic, you must add your <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> to the backend <code>.env</code> file.
+          </div>
+        </div>
+      )}
+
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 20 }}>
         {[
