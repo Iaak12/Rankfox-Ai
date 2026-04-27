@@ -14,7 +14,7 @@ export default function AutoBacklink() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const types = ['Web 2.0 Auto-Publisher', 'Directory Submissions', 'Profile Backlinks'];
+  const types = ['Web 2.0 Auto-Publisher', 'Directory Submissions', 'Profile Backlinks', 'Blog Post Auto-Publisher', 'Article Submission'];
 
   const addLog = (msg) => {
     setConsoleLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
