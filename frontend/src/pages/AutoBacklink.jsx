@@ -73,11 +73,11 @@ export default function AutoBacklink() {
           Automatically generate content, register accounts, and publish backlinks across high-DA platforms with zero manual effort.
         </p>
 
-        {/* Simulation Banner */}
-        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '12px 16px', borderRadius: 8, marginBottom: 20, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 16 }}>⚠️</span>
+        {/* Information Banner */}
+        <div style={{ background: '#e0f2fe', border: '1px solid #bae6fd', color: '#0369a1', padding: '12px 16px', borderRadius: 8, marginBottom: 20, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 16 }}>ℹ️</span>
           <div>
-            <strong>Simulation Mode Active:</strong> RankFox is currently simulating the backlink creation process using AI. The generated URLs are mock examples for demonstration purposes. Real auto-publishing requires custom API setups and manual bot-evasion proxies.
+            <strong>Automated Submissions Active:</strong> RankFox will automatically ping and submit your domain to high-DA stat and directory websites. This creates real, clickable profile backlinks instantly. (Note: Posting articles to third-party Web 2.0 sites like Medium/Blogger requires API connections which are coming soon).
           </div>
         </div>
 
