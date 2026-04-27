@@ -1,7 +1,7 @@
 const Groq = require('groq-sdk');
 const { google } = require('googleapis');
 const Cache = require('../models/Cache');
-const { performRealAudit } = require('../utils/realCrawler');
+const { performRealAudit, crawlUrl } = require('../utils/realCrawler');
 
 // Lazy initialization so missing API key doesn't crash the whole server
 let groqInstance = null;
@@ -637,15 +637,39 @@ const contentRefresh = async (req, res) => {
   if (!url) return res.status(400).json({ message: 'URL required' });
 
   try {
+    // Attempt to crawl the URL to get real context
+    let pageContext = '';
+    let wordCount = 850;
+    try {
+      const { html, error } = await crawlUrl(url);
+      if (!error && html) {
+        // Simple extraction of text content from body
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+        const bodyHtml = bodyMatch ? bodyMatch[1] : html;
+        const textOnly = bodyHtml.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                                 .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                 .replace(/<[^>]+>/g, ' ')
+                                 .replace(/\s+/g, ' ')
+                                 .trim();
+        wordCount = textOnly.split(' ').length;
+        pageContext = textOnly.substring(0, 4000); // Send first 4k chars to LLM
+      }
+    } catch (e) {
+      console.warn("Could not crawl URL for refresh:", e.message);
+    }
+
+    const promptContext = pageContext ? `Here is the current content of the page (first 4000 characters):\n${pageContext}\n\n` : '';
+
     const data = await askGroq(`
 You are an expert SEO Content Editor.
 The user wants to refresh an outdated blog post: "${url}"
+${promptContext}
 
-Return JSON:
+Return JSON with exactly these keys:
 {
   "status": "success",
-  "originalWordCount": 850,
-  "newWordCount": 1450,
+  "originalWordCount": ${wordCount || 850},
+  "newWordCount": ${(wordCount || 850) + 600},
   "outdatedElementsFound": [
     "Identified outdated statistics",
     "Missing modern context"
@@ -653,9 +677,17 @@ Return JSON:
   "newKeywordsAdded": [
     "2026 seo trends", "modern strategy"
   ],
-  "refreshedContent": "The full, newly written, completely refreshed and expanded SEO-optimized article content here. (Generate at least 3 comprehensive paragraphs of highly professional refreshed content)."
+  "refreshedContent": "The full, newly written, completely refreshed and expanded SEO-optimized article content here in markdown format. You MUST include this field. Generate at least 3 comprehensive paragraphs."
 }
+
+CRITICAL: Do NOT omit the 'refreshedContent' key. Ensure your response is valid JSON.
 `);
+
+    // Fallback if AI used 'content' instead of 'refreshedContent'
+    if (data && !data.refreshedContent && data.content) {
+      data.refreshedContent = data.content;
+    }
+
     res.json(data);
   } catch (err) {
     console.error('Content Refresh error:', err.message);
