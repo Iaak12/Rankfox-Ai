@@ -343,7 +343,19 @@ function IntegrationsTab() {
       }
     } else {
       let payload = { token: 'mock_token_123' };
-      if (id === 'wordpress') {
+      if (id === 'gsc') {
+        setConnecting(c => ({ ...c, [id]: true }));
+        try {
+          const { data } = await axios.get(`${API_URL}/integrations/gsc/auth-url`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          window.location.href = data.url;
+        } catch (e) {
+          alert('Failed to start GSC OAuth: ' + (e.response?.data?.message || e.message));
+          setConnecting(c => ({ ...c, [id]: false }));
+        }
+        return; // Redirecting, so return early
+      } else if (id === 'wordpress') {
         const url = window.prompt('Enter your WordPress Site URL (e.g. https://site.com):');
         if (!url) return;
         const username = window.prompt('Enter your WordPress Admin Username:');

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlayCircle, ArrowRight, PenLine, Copy, Globe, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { seoApi } from '../utils/seoApi';
 import FoxPackTeam from '../components/FoxPackTeam';
 
@@ -128,15 +129,35 @@ export default function Dashboard() {
     setGscDismissed(true);
   };
 
-  const connectGsc = () => {
-    setGscConnecting(true);
-    // Simulate OAuth flow delay
-    setTimeout(() => {
-      setGscConnecting(false);
+  // Check if we just returned from OAuth successfully
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('gsc') === 'connected') {
       setGscConnected(true);
       localStorage.setItem('gsc_connected', 'true');
-      setGscDismissed(true); // Auto-hide banner once connected
-    }, 2500);
+      setGscDismissed(true);
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  const connectGsc = async () => {
+    setGscConnecting(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return alert('Please login first');
+      
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/integrations/gsc/auth-url`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Redirect to Google OAuth
+      window.location.href = res.data.url;
+    } catch (e) {
+      console.error('Failed to start GSC OAuth:', e);
+      alert('Failed to connect to Google: ' + (e.response?.data?.message || e.message));
+      setGscConnecting(false);
+    }
   };
 
   const handleCreate = async (art) => {
