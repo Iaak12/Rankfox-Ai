@@ -14,6 +14,9 @@ const faqRoutes = require('./routes/faqRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 const integrationRoutes = require('./routes/integrationRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const geoMonitorRoutes = require('./routes/geoMonitorRoutes');
+const attributionRoutes = require('./routes/attributionRoutes');
+const { startMonitoringJobs } = require('./utils/monitoringCron');
 
 // Connect to database
 connectDB();
@@ -64,6 +67,8 @@ app.use('/api/faqs', faqRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/geo-monitor', geoMonitorRoutes);
+app.use('/api/attribution', attributionRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -74,4 +79,6 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  // Start always-on background monitoring (every 6 hours)
+  startMonitoringJobs();
 });

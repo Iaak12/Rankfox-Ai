@@ -30,6 +30,9 @@ import BlogPost from './pages/BlogPost';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Chatbot from './components/Chatbot';
+import GeoMonitor from './pages/GeoMonitor';
+import AIAttribution from './pages/AIAttribution';
+import AlertsCenter from './pages/AlertsCenter';
 import './chatbot.css';
 
 const PAGE_TITLES = {
@@ -48,6 +51,9 @@ const PAGE_TITLES = {
   '/dashboard/audit': 'Site Audit',
   '/dashboard/optimizer': 'Page Optimizer',
   '/dashboard/geo': 'Geo Optimizer',
+  '/dashboard/geo-monitor': 'AI Brand Monitor',
+  '/dashboard/attribution': 'AI Traffic Attribution',
+  '/dashboard/alerts': 'Monitoring Alerts',
   '/dashboard/account': 'My Account',
 };
 
@@ -193,6 +199,9 @@ function DashboardLayout() {
             <Route path="/audit" element={<SiteAudit />} />
             <Route path="/optimizer" element={<PageOptimizer />} />
             <Route path="/geo" element={<GeoOptimizer />} />
+            <Route path="/geo-monitor" element={<GeoMonitor />} />
+            <Route path="/attribution" element={<AIAttribution />} />
+            <Route path="/alerts" element={<AlertsCenter />} />
             <Route path="/account" element={<AccountSettingsRoute />} />
           </Routes>
         </div>

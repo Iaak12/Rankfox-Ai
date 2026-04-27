@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
 const Cache = require('../models/Cache');
+const { performRealAudit } = require('../utils/realCrawler');
 
 // Lazy initialization so missing API key doesn't crash the whole server
 let groqInstance = null;
@@ -186,36 +187,47 @@ Be specific in the detail field.
   }
 };
 
-/* ─── Site Audit ─── */
+/* ─── Site Audit (REAL CRAWLER) ─── */
 // POST /api/seo/audit  { url }
 const siteAudit = async (req, res) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ message: 'URL required' });
 
   try {
+    // Step 1: Real HTTP crawl — parse actual HTML, headers, load time
+    const realData = await performRealAudit(url);
+
+    // Step 2: If real crawl succeeded, return real data directly
+    if (!realData.error) {
+      return res.json(realData);
+    }
+
+    // Step 3: Fallback — site unreachable, use AI analysis
+    console.warn('Real crawl failed, falling back to AI audit:', realData.error);
     const data = await askGroq(`
 You are an expert technical SEO auditor.
-Perform a comprehensive technical SEO audit for the website: "${url}"
+The website "${url}" could not be crawled (error: ${realData.error}).
+Perform a best-effort SEO analysis based on what you know about this domain.
 
-Based on common SEO best practices and what you know about websites, return JSON:
+Return JSON:
 {
   "score": <number 0-100>,
   "domain": "${url}",
+  "realCrawl": false,
   "checks": [
-    { "label": "check name", "status": "pass"|"warn"|"fail", "detail": "specific detail about this site" }
+    { "label": "check name", "status": "pass"|"warn"|"fail", "detail": "detail" }
   ],
-  "criticalIssues": <count of fail>,
-  "warnings": <count of warn>,
-  "passed": <count of pass>,
-  "priorityFixes": ["most important fix 1", "fix 2", "fix 3"]
+  "criticalIssues": <count>,
+  "warnings": <count>,
+  "passed": <count>,
+  "priorityFixes": ["fix 1", "fix 2", "fix 3"]
 }
-
-Include 12-15 checks covering: Title Tag, Meta Description, H1, H2 Structure, Internal Links, External Links, Image Alt Text, Schema Markup, Page Speed, Mobile Friendly, Canonical Tag, Open Graph, SSL/HTTPS, Robots.txt, Sitemap, Core Web Vitals.
+Include 10 checks.
 `);
     res.json(data);
   } catch (err) {
     console.error('Audit error:', err.message);
-    res.status(500).json({ message: 'AI error: ' + err.message });
+    res.status(500).json({ message: 'Audit error: ' + err.message });
   }
 };
 
