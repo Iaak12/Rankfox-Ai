@@ -25,15 +25,25 @@ const getContacts = async (req, res) => {
   }
 };
 
-// @desc    Toggle user access
-// @route   PUT /api/admin/users/:id/access
+// @desc    Update user access (hasAccess and accessLevel)
+// @route   PUT /api/admin/users/access/:id
 // @access  Private/Admin
 const toggleAccess = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.hasAccess = !user.hasAccess;
+    if (req.body.hasAccess !== undefined) {
+      user.hasAccess = req.body.hasAccess;
+    } else if (req.body.accessLevel === undefined) {
+      // Fallback for old UI toggle
+      user.hasAccess = !user.hasAccess;
+    }
+    
+    if (req.body.accessLevel !== undefined) {
+      user.accessLevel = req.body.accessLevel;
+    }
+
     await user.save();
     res.json(user);
   } catch (error) {

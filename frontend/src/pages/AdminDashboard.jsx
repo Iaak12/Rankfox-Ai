@@ -146,23 +146,22 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleToggleAccess = async (userId) => {
+  const handleUpdateAccess = async (userId, value) => {
     const token = localStorage.getItem('adminToken');
-    console.log('Toggling access for:', userId);
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      };
-      // Point back to the real admin route
-      const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/admin/users/access/${userId}`, {}, config);
-      console.log('Toggle success:', data);
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const hasAccess = value !== 'none';
+      const accessLevel = value === 'none' ? 'view' : value;
       
-      // Ensure data is the full user object
+      const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/admin/users/access/${userId}`, {
+        hasAccess,
+        accessLevel
+      }, config);
+      
       if (data._id) {
         setUsers(users.map(u => u._id === userId ? data : u));
       }
     } catch (err) {
-      console.error('Toggle error:', err);
       alert('Error: ' + (err.response?.data?.message || err.message));
     }
   };
@@ -641,22 +640,25 @@ export default function AdminDashboard() {
                       </td>
                       <td>
                         {!u.isAdmin && (
-                          <button 
-                            onClick={() => handleToggleAccess(u._id)}
+                          <select 
+                            value={u.hasAccess ? (u.accessLevel || 'view') : 'none'}
+                            onChange={(e) => handleUpdateAccess(u._id, e.target.value)}
                             style={{ 
                               padding: '6px 12px', 
                               borderRadius: 8, 
                               border: '1px solid #e2e8f0',
-                              background: u.hasAccess ? '#fee2e2' : '#dcfce7',
-                              color: u.hasAccess ? '#ef4444' : '#16a34a',
+                              background: u.hasAccess ? (u.accessLevel === 'edit' ? '#dbeafe' : '#dcfce7') : '#f1f5f9',
+                              color: u.hasAccess ? (u.accessLevel === 'edit' ? '#2563eb' : '#16a34a') : '#64748b',
                               fontSize: 12,
                               fontWeight: 600,
                               cursor: 'pointer',
-                              transition: 'all 0.2s'
+                              outline: 'none'
                             }}
                           >
-                            {u.hasAccess ? 'Revoke Access' : 'Grant Access'}
-                          </button>
+                            <option value="none">Revoke Access</option>
+                            <option value="view">Grant: View Only</option>
+                            <option value="edit">Grant: Editor</option>
+                          </select>
                         )}
                       </td>
                     </tr>

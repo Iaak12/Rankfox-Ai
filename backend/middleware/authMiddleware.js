@@ -30,4 +30,12 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+const requireEditAccess = (req, res, next) => {
+  if (req.user && (req.user.isAdmin || (req.user.hasAccess && req.user.accessLevel === 'edit'))) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Edit access required to perform this action. You currently have View-Only access.' });
+  }
+};
+
+module.exports = { protect, admin, requireEditAccess };

@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  accessLevel: {
+    type: String,
+    enum: ['view', 'edit'],
+    default: 'view',
+  },
   otp: String,
   otpExpires: Date,
   integrations: {

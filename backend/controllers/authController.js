@@ -119,6 +119,8 @@ const verifyEmail = async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      hasAccess: user.hasAccess,
+      accessLevel: user.accessLevel,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -188,6 +190,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         isAdmin: user.isAdmin,
         hasAccess: user.hasAccess,
+        accessLevel: user.accessLevel,
         token: generateToken(user._id),
       });
     } else {

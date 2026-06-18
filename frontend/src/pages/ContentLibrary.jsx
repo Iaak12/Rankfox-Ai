@@ -248,7 +248,9 @@ export default function ContentLibrary() {
                   <button className="action-btn" style={{ flex: 1, justifyContent: 'center' }}><PenLine size={12} /> Edit</button>
                   <button className="action-btn-icon" title="Preview" onClick={() => viewArticle(art)}><Eye size={13} /></button>
                   <button className="action-btn-icon" title="Publish to WordPress" onClick={() => publishToWordPress(artId)}><UploadCloud size={13} color="#3b82f6" /></button>
-                  <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(artId)}><Trash2 size={13} /></button>
+                  {JSON.parse(localStorage.getItem('user') || '{}').isAdmin && (
+                    <button className="action-btn-icon" title="Delete" style={{ color: '#ef4444' }} onClick={() => deleteArticle(artId)}><Trash2 size={13} /></button>
+                  )}
                 </div>
               </div>
             );
