@@ -65,7 +65,21 @@ export default function Sidebar() {
 
       {/* GEO Intelligence Section Label */}
       <nav className="sidebar-nav">
-        {navItems.map(({ icon: Icon, label, to, locked, badge, alertBadge }) => (
+        {navItems.filter(item => {
+          const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+          const isEdit = userObj.isAdmin || userObj.accessLevel === 'edit';
+          if (isEdit) return true;
+          
+          // For 'view' access, only show Dashboard, Content Library, Links, Indexing/Insights
+          const viewAllowed = [
+            '/dashboard', 
+            '/dashboard/library', 
+            '/dashboard/indexing', 
+            '/dashboard/insights',
+            '/dashboard/links'
+          ];
+          return viewAllowed.includes(item.to);
+        }).map(({ icon: Icon, label, to, locked, badge, alertBadge }) => (
           <NavLink
             key={to}
             to={to}

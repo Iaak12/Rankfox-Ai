@@ -182,172 +182,179 @@ export default function Dashboard() {
     }
   };
 
-  return (
-    <div className="page-content">
+    const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+    const isEdit = userObj.isAdmin || userObj.accessLevel === 'edit';
 
-      {/* GSC Connection Banner */}
-      {!gscDismissed && !gscConnected && (
-        <div className="gsc-banner">
-          <div className="gsc-banner-left">
-            <GSCIcon />
-            <span>Connect your Google Search Console to activate AI-driven SEO insights</span>
+    return (
+      <div className="page-content">
+
+        {/* GSC Connection Banner */}
+        {!gscDismissed && !gscConnected && (
+          <div className="gsc-banner">
+            <div className="gsc-banner-left">
+              <GSCIcon />
+              <span>Connect your Google Search Console to activate AI-driven SEO insights</span>
+            </div>
+            <div className="gsc-banner-right">
+              <button className="gsc-connect-btn" onClick={connectGsc} disabled={gscConnecting} style={{ opacity: gscConnecting ? 0.8 : 1 }}>
+                {gscConnecting ? (
+                  <><span className="spinner" style={{ width: 14, height: 14, borderColor: '#ccc', borderTopColor: '#333' }} /> Connecting...</>
+                ) : (
+                  <><GSCIcon /> Connect to GSC</>
+                )}
+              </button>
+              <button className="gsc-dismiss-btn" onClick={dismissGsc} aria-label="Dismiss">
+                <X size={15} />
+              </button>
+            </div>
           </div>
-          <div className="gsc-banner-right">
-            <button className="gsc-connect-btn" onClick={connectGsc} disabled={gscConnecting} style={{ opacity: gscConnecting ? 0.8 : 1 }}>
-              {gscConnecting ? (
-                <><span className="spinner" style={{ width: 14, height: 14, borderColor: '#ccc', borderTopColor: '#333' }} /> Connecting...</>
-              ) : (
-                <><GSCIcon /> Connect to GSC</>
+        )}
+
+        {gscConnected && (
+          <div style={{ background: '#dcfce7', color: '#16a34a', padding: '12px 16px', borderRadius: 8, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+            <CheckCircle2 size={16} /> Successfully synced with Google Search Console via RankFox AI.
+          </div>
+        )}
+
+        {/* Top 3 cards */}
+        <div className="dashboard-top-grid" style={{ gridTemplateColumns: isEdit ? '1fr 1fr 1fr' : '1fr 1fr' }}>
+
+          {/* Insights */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="card-title">Insights</div>
+            <div className="insights-filters">
+              {filters.map(f => (
+                <button key={f} className={`filter-pill${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>{f}</button>
+              ))}
+              <button className="filter-pill" title="Calendar" style={{ padding: '4px 8px' }}>📅</button>
+            </div>
+            <div className="insights-stats" style={{ position: 'relative' }}>
+              {loadingInsights && (
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                  <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
+                </div>
               )}
-            </button>
-            <button className="gsc-dismiss-btn" onClick={dismissGsc} aria-label="Dismiss">
-              <X size={15} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {gscConnected && (
-        <div style={{ background: '#dcfce7', color: '#16a34a', padding: '12px 16px', borderRadius: 8, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
-          <CheckCircle2 size={16} /> Successfully synced with Google Search Console via RankFox AI.
-        </div>
-      )}
-
-      {/* Top 3 cards */}
-      <div className="dashboard-top-grid">
-
-        {/* Insights */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="card-title">Insights</div>
-          <div className="insights-filters">
-            {filters.map(f => (
-              <button key={f} className={`filter-pill${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>{f}</button>
-            ))}
-            <button className="filter-pill" title="Calendar" style={{ padding: '4px 8px' }}>📅</button>
-          </div>
-          <div className="insights-stats" style={{ position: 'relative' }}>
-            {loadingInsights && (
-              <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
-                <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
-              </div>
-            )}
-            <div className="stat-item">
-              <span className="stat-icon">🌀</span>
-              <div>
-                <div className="stat-number">{insightsData ? insightsData.global.totalTraffic : '0'}</div>
-                <div className="stat-label">Total Traffic</div>
-              </div>
-            </div>
-            <div className="stat-item">
-              <span className="stat-icon">👁</span>
-              <div>
-                <div className="stat-number">{insightsData ? insightsData.global.totalImpressions : '0'}</div>
-                <div className="stat-label">Total Impressions</div>
-              </div>
-            </div>
-          </div>
-          <div className="card-footer" style={{ marginTop: 'auto' }}>
-            <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
-            <a className="action-link" href="/dashboard/insights">More Insights <ArrowRight size={13} /></a>
-          </div>
-        </div>
-
-        {/* Indexing */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="card-title">Indexing</div>
-          {loadingInsights ? (
-             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-               <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
-             </div>
-          ) : (
-            <>
-              <div className="index-number">{insightsData ? '1,492' : '0'}</div>
-              <div className="index-label">Total Pages Indexed</div>
-            </>
-          )}
-          <div className="card-footer" style={{ marginTop: 'auto' }}>
-            <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
-            <a className="action-link" href="/dashboard/indexing"><Globe size={13} /> Index Pages <ArrowRight size={13} /></a>
-          </div>
-        </div>
-
-        {/* Keyword Search */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="card-title">Keyword Search</div>
-          <div className="keyword-input-wrap">
-            <input
-              className="keyword-input"
-              placeholder="Enter Keyword & press Enter"
-              value={kwInput}
-              onChange={e => setKwInput(e.target.value)}
-              onKeyDown={handleKwSearch}
-            />
-            <span className="keyword-search-icon" onClick={() => kwInput.trim() && navigate(`/dashboard/keywords?q=${encodeURIComponent(kwInput.trim())}`)} style={{ cursor: 'pointer' }}>🔍</span>
-          </div>
-          <div className="card-footer" style={{ marginTop: 'auto' }}>
-            <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
-            <a className="action-link" href="/dashboard/keywords">Find Keywords <ArrowRight size={13} /></a>
-          </div>
-        </div>
-      </div>
-
-      {/* Fox Pack Team */}
-      <FoxPackTeam />
-
-      {/* Article Table */}
-      <div className="table-card" style={{ marginTop: 24 }}>
-        <div className="table-header">
-          <span>Article Title</span>
-          <span>Difficulty</span>
-          <span>Volume</span>
-          <span></span>
-        </div>
-        {ARTICLES.map(art => {
-          const ds = getDiffStyle(art.difficulty);
-          const isGen = generating[art.id];
-          return (
-            <div className="table-row" key={art.id}>
-              <div className="article-title-cell">
-                <div className="article-name">{art.title}</div>
-                <div className="keyword-tag">
-                  Primary Keyword: <span className={`keyword-badge ${art.badgeClass}`}>{art.keyword}</span>
+              <div className="stat-item">
+                <span className="stat-icon">🌀</span>
+                <div>
+                  <div className="stat-number">{insightsData ? insightsData.global.totalTraffic : '0'}</div>
+                  <div className="stat-label">Total Traffic</div>
                 </div>
               </div>
-              <div>
-                <span className="diff-badge" style={{ background: ds.bg, color: ds.color }}>{art.difficulty}</span>
-              </div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{art.volume.toLocaleString()}</div>
-              <div className="table-actions">
-                <button
-                  className="action-btn primary-btn"
-                  onClick={() => handleCreate(art)}
-                  disabled={isGen}
-                  style={{ minWidth: 120, opacity: isGen ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
-                >
-                  {isGen
-                    ? <><span className="spinner" style={{ width: 11, height: 11, borderTopColor: '#fff' }} /> {agentStatus[art.id]}</>
-                    : <><Sparkles size={12} /> Summon Pack</>
-                  }
-                </button>
-                <button className="action-btn-icon" title="Copy" onClick={() => navigator.clipboard.writeText(art.title)}>
-                  <Copy size={13} />
-                </button>
+              <div className="stat-item">
+                <span className="stat-icon">👁</span>
+                <div>
+                  <div className="stat-number">{insightsData ? insightsData.global.totalImpressions : '0'}</div>
+                  <div className="stat-label">Total Impressions</div>
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+            <div className="card-footer" style={{ marginTop: 'auto' }}>
+              <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
+              <a className="action-link" href="/dashboard/insights">More Insights <ArrowRight size={13} /></a>
+            </div>
+          </div>
 
-      {/* Article Modal */}
-      {modal && (
-        <ArticleModal
-          article={modal.article}
-          article_data={modal.data}
-          onClose={() => setModal(null)}
-        />
-      )}
-    </div>
-  );
+          {/* Indexing */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="card-title">Indexing</div>
+            {loadingInsights ? (
+               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                 <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3, borderTopColor: '#6c47ff' }} />
+               </div>
+            ) : (
+              <>
+                <div className="index-number">{insightsData ? '1,492' : '0'}</div>
+                <div className="index-label">Total Pages Indexed</div>
+              </>
+            )}
+            <div className="card-footer" style={{ marginTop: 'auto' }}>
+              <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
+              <a className="action-link" href="/dashboard/indexing"><Globe size={13} /> Index Pages <ArrowRight size={13} /></a>
+            </div>
+          </div>
+
+          {/* Keyword Search */}
+          {isEdit && (
+            <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="card-title">Keyword Search</div>
+              <div className="keyword-input-wrap">
+                <input
+                  className="keyword-input"
+                  placeholder="Enter Keyword & press Enter"
+                  value={kwInput}
+                  onChange={e => setKwInput(e.target.value)}
+                  onKeyDown={handleKwSearch}
+                />
+                <span className="keyword-search-icon" onClick={() => kwInput.trim() && navigate(`/dashboard/keywords?q=${encodeURIComponent(kwInput.trim())}`)} style={{ cursor: 'pointer' }}>🔍</span>
+              </div>
+              <div className="card-footer" style={{ marginTop: 'auto' }}>
+                <button className="how-it-works-btn"><PlayCircle size={13} /> How it Works</button>
+                <a className="action-link" href="/dashboard/keywords">Find Keywords <ArrowRight size={13} /></a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Fox Pack Team */}
+        {isEdit && <FoxPackTeam />}
+
+        {/* Article Table */}
+        {isEdit && (
+          <div className="table-card" style={{ marginTop: 24 }}>
+            <div className="table-header">
+              <span>Article Title</span>
+              <span>Difficulty</span>
+              <span>Volume</span>
+              <span></span>
+            </div>
+            {ARTICLES.map(art => {
+              const ds = getDiffStyle(art.difficulty);
+              const isGen = generating[art.id];
+              return (
+                <div className="table-row" key={art.id}>
+                  <div className="article-title-cell">
+                    <div className="article-name">{art.title}</div>
+                    <div className="keyword-tag">
+                      Primary Keyword: <span className={`keyword-badge ${art.badgeClass}`}>{art.keyword}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="diff-badge" style={{ background: ds.bg, color: ds.color }}>{art.difficulty}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#6b7280' }}>{art.volume.toLocaleString()}</div>
+                  <div className="table-actions">
+                    <button
+                      className="action-btn primary-btn"
+                      onClick={() => handleCreate(art)}
+                      disabled={isGen}
+                      style={{ minWidth: 120, opacity: isGen ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
+                    >
+                      {isGen
+                        ? <><span className="spinner" style={{ width: 11, height: 11, borderTopColor: '#fff' }} /> {agentStatus[art.id]}</>
+                        : <><Sparkles size={12} /> Summon Pack</>
+                      }
+                    </button>
+                    <button className="action-btn-icon" title="Copy" onClick={() => navigator.clipboard.writeText(art.title)}>
+                      <Copy size={13} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Article Modal */}
+        {modal && (
+          <ArticleModal
+            article={modal.article}
+            article_data={modal.data}
+            onClose={() => setModal(null)}
+          />
+        )}
+      </div>
+    );
 }
 
 
